@@ -46,7 +46,7 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+                              <BrowserRouter basename={import.meta.env.DEV ? "/" : "/procoder-tasks"}>
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route 
