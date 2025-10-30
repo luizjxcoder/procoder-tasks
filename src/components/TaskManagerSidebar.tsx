@@ -99,9 +99,8 @@ export function TaskManagerSidebar() {
                     {/* Logo */}
                     <div className="mb-8 flex items-center gap-3">
                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
-                              <img
-                                   src="/lovable-uploads/minhaLogo.png"
-                                   alt="Logo"
+
+                              <img src={`${import.meta.env.BASE_URL}lovable-uploads/minhaLogo.png`} alt="Logo"
                                    className="w-full h-full object-contain"
                               />
 
