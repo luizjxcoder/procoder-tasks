@@ -1,6 +1,7 @@
 {
   "name": "procoder-tasks",
   "version": "1.0.0",
+  "homepage": "https://luizjxcoder.github.io/procoder-tasks/",
   "private": true,
   "type": "module",
   "scripts": {
