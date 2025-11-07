@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider, useAuth } from "@/hooks/useAuth"
 import { SettingsProvider } from "@/contexts/SettingsContext"
 import { ThemeProvider } from "@/contexts/ThemeContext"
@@ -46,7 +46,8 @@ const App = () => (
                          <TooltipProvider>
                               <Toaster />
                               <Sonner />
-                              <BrowserRouter basename={import.meta.env.DEV ? "/" : "/procoder-tasks"}>
+                              {/* 🔁 Substituído BrowserRouter por HashRouter para compatibilidade com GitHub Pages */}
+                              <HashRouter>
                                    <Routes>
                                         <Route path="/auth" element={<Auth />} />
                                         <Route
@@ -121,10 +122,10 @@ const App = () => (
                                                   </ProtectedRoute>
                                              }
                                         />
-                                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                                        {/* Catch-all */}
                                         <Route path="*" element={<NotFound />} />
                                    </Routes>
-                              </BrowserRouter>
+                              </HashRouter>
                          </TooltipProvider>
                     </ThemeProvider>
                </SettingsProvider>
