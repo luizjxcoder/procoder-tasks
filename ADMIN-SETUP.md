@@ -163,4 +163,4 @@ Sempre que fizer qualquer mudança no código-fonte:
 
 git add .
 git commit -m "feat: descrição objetiva da mudança"
-git push origin main
+git push origin master
