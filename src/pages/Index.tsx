@@ -270,7 +270,7 @@ const Index = () => {
                                                        <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            onClick={() => navigate('/procoder-tasks/projects')} // ✅ Atualizado
+                                                            onClick={() => navigate('/projects')} // ✅ Atualizado
                                                             className="text-primary hover:text-primary/80"
                                                        >
                                                             Ver Todos
