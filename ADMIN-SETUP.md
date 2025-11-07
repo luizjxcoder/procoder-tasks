@@ -157,10 +157,3 @@ git commit -m "build atualizado"
 git push origin master   # envia o código-fonte atualizado
 npm run deploy           # publica o dist no branch gh-pages
 
-## Fluxo Correto Após Alterações no Código COM WORKFLOW
-
-Sempre que fizer qualquer mudança no código-fonte:
-
-git add .
-git commit -m "feat: descrição objetiva da mudança"
-git push origin master
