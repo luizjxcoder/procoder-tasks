@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { TaskDetailsModal } from "@/components/TaskDetailsModal"
+import { SubtaskManager } from "@/components/SubtaskManager"
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { TaskManagerSidebar } from "@/components/TaskManagerSidebar"
@@ -34,6 +35,8 @@ interface Task {
      estimated_time: string | null
      created_at: string
      updated_at: string
+     parent_task_id: string | null
+     subtasks?: Task[]
 }
 
 interface Project {
@@ -89,18 +92,38 @@ export default function Tasks() {
           estimated_time: ''
      })
 
+     const [subtasks, setSubtasks] = useState<Array<{ title: string; status: 'todo' | 'completed' }>>([])
+
      const fetchTasks = async () => {
           if (!user) return
 
           try {
-               const { data, error } = await supabase
+               // Fetch only parent tasks (tasks without parent_task_id)
+               const { data: parentTasks, error: parentError } = await supabase
                     .from('tasks')
                     .select('*')
                     .eq('user_id', user.id)
+                    .is('parent_task_id', null)
                     .order('created_at', { ascending: false })
 
-               if (error) throw error
-               setTasks(data as Task[] || [])
+               if (parentError) throw parentError
+
+               // Fetch all subtasks
+               const { data: allSubtasks, error: subtasksError } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .not('parent_task_id', 'is', null)
+
+               if (subtasksError) throw subtasksError
+
+               // Organize tasks with their subtasks
+               const tasksWithSubtasks = (parentTasks || []).map(task => ({
+                    ...task,
+                    subtasks: (allSubtasks || []).filter(subtask => subtask.parent_task_id === task.id)
+               }))
+
+               setTasks(tasksWithSubtasks as Task[])
           } catch (error) {
                console.error('Error fetching tasks:', error)
                toast({
@@ -145,13 +168,15 @@ export default function Tasks() {
                due_date: '',
                estimated_time: ''
           })
+          setSubtasks([])
      }
 
      const handleCreate = async () => {
           if (!user || !formData.title.trim()) return
 
           try {
-               const { data, error } = await supabase
+               // Create parent task
+               const { data: parentTask, error: parentError } = await supabase
                     .from('tasks')
                     .insert([{
                          user_id: user.id,
@@ -161,20 +186,51 @@ export default function Tasks() {
                          priority: formData.priority,
                          status: formData.status,
                          due_date: formData.due_date || null,
-                         estimated_time: formData.estimated_time.trim() || null
+                         estimated_time: formData.estimated_time.trim() || null,
+                         parent_task_id: null
                     }])
                     .select()
                     .single()
 
-               if (error) throw error
+               if (parentError) throw parentError
 
-               setTasks(prev => [data as Task, ...prev])
+               // Create subtasks if any
+               let createdSubtasks: Task[] = []
+               if (subtasks.length > 0) {
+                    const subtasksToInsert = subtasks.map(subtask => ({
+                         user_id: user.id,
+                         title: subtask.title,
+                         description: null,
+                         project_id: formData.project_id || null,
+                         priority: formData.priority,
+                         status: subtask.status === 'completed' ? 'completed' : 'todo',
+                         due_date: formData.due_date || null,
+                         estimated_time: null,
+                         parent_task_id: parentTask.id
+                    }))
+
+                    const { data: subtasksData, error: subtasksError } = await supabase
+                         .from('tasks')
+                         .insert(subtasksToInsert)
+                         .select()
+
+                    if (subtasksError) throw subtasksError
+                    createdSubtasks = subtasksData as Task[]
+               }
+
+               // Add to tasks list with subtasks
+               const taskWithSubtasks = {
+                    ...parentTask,
+                    subtasks: createdSubtasks
+               } as Task
+
+               setTasks(prev => [taskWithSubtasks, ...prev])
                setIsCreateOpen(false)
                resetForm()
 
                toast({
                     title: "Task criada",
-                    description: "Task criada com sucesso"
+                    description: `Task criada com sucesso${subtasks.length > 0 ? ` com ${subtasks.length} subtarefa(s)` : ''}`
                })
           } catch (error) {
                console.error('Error creating task:', error)
@@ -190,7 +246,8 @@ export default function Tasks() {
           if (!editingTask || !formData.title.trim()) return
 
           try {
-               const { data, error } = await supabase
+               // Update parent task
+               const { data: updatedTask, error: updateError } = await supabase
                     .from('tasks')
                     .update({
                          title: formData.title.trim(),
@@ -205,9 +262,47 @@ export default function Tasks() {
                     .select()
                     .single()
 
-               if (error) throw error
+               if (updateError) throw updateError
 
-               setTasks(prev => prev.map(task => task.id === editingTask.id ? data as Task : task))
+               // Delete existing subtasks
+               const { error: deleteError } = await supabase
+                    .from('tasks')
+                    .delete()
+                    .eq('parent_task_id', editingTask.id)
+
+               if (deleteError) throw deleteError
+
+               // Create new subtasks
+               let createdSubtasks: Task[] = []
+               if (subtasks.length > 0) {
+                    const subtasksToInsert = subtasks.map(subtask => ({
+                         user_id: user!.id,
+                         title: subtask.title,
+                         description: null,
+                         project_id: formData.project_id || null,
+                         priority: formData.priority,
+                         status: subtask.status === 'completed' ? 'completed' : 'todo',
+                         due_date: formData.due_date || null,
+                         estimated_time: null,
+                         parent_task_id: editingTask.id
+                    }))
+
+                    const { data: subtasksData, error: subtasksError } = await supabase
+                         .from('tasks')
+                         .insert(subtasksToInsert)
+                         .select()
+
+                    if (subtasksError) throw subtasksError
+                    createdSubtasks = subtasksData as Task[]
+               }
+
+               // Update tasks list with subtasks
+               const taskWithSubtasks = {
+                    ...updatedTask,
+                    subtasks: createdSubtasks
+               } as Task
+
+               setTasks(prev => prev.map(task => task.id === editingTask.id ? taskWithSubtasks : task))
                setIsEditOpen(false)
                setEditingTask(null)
                resetForm()
@@ -284,6 +379,14 @@ export default function Tasks() {
                due_date: task.due_date || '',
                estimated_time: task.estimated_time || ''
           })
+
+          // Load existing subtasks
+          const existingSubtasks = (task.subtasks || []).map(subtask => ({
+               title: subtask.title,
+               status: subtask.status === 'completed' ? 'completed' as const : 'todo' as const
+          }))
+          setSubtasks(existingSubtasks)
+
           setIsEditOpen(true)
      }
 
@@ -507,6 +610,11 @@ export default function Tasks() {
                                                                  />
                                                             </div>
                                                        </div>
+
+                                                       <SubtaskManager
+                                                            subtasks={subtasks}
+                                                            onSubtasksChange={setSubtasks}
+                                                       />
 
                                                        <div className="flex flex-col-reverse sm:flex-row gap-2 pt-4">
                                                             <Button
@@ -852,6 +960,11 @@ export default function Tasks() {
                                                        />
                                                   </div>
                                              </div>
+
+                                             <SubtaskManager
+                                                  subtasks={subtasks}
+                                                  onSubtasksChange={setSubtasks}
+                                             />
 
                                              <div className="flex flex-col-reverse sm:flex-row gap-2 pt-4">
                                                   <Button
