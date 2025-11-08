@@ -14,7 +14,7 @@ import { Plus, TrendingUp, Users, Clock, Target } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigate } from "react-router-dom" // ✅ Adicionado para navegação SPA
-
+import { useSettings } from "@/contexts/SettingsContext"
 // Mock data
 const projects = [
      {
@@ -84,6 +84,7 @@ const tasks = [
 
 const Index = () => {
      const { user } = useAuth()
+     const { userName } = useSettings()
      const navigate = useNavigate() // ✅ Substitui window.location.href
      const [userTasks, setUserTasks] = useState<any[]>(tasks)
      const [stats, setStats] = useState([
@@ -215,7 +216,9 @@ const Index = () => {
                                    <div className="flex items-center gap-4">
                                         <SidebarTrigger className="lg:hidden" />
                                         <div>
-                                             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard</h1>
+                                             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                                                  {userName ? `Olá ${userName} - ` : ""}Dashboard
+                                             </h1>
                                              <p className="text-sm sm:text-base text-muted-foreground">
                                                   Bem vindo de volta! Vamos ver o que há de novo em seus projetos.
                                              </p>

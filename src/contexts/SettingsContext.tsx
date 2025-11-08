@@ -3,43 +3,57 @@ import * as React from "react"
 const { createContext, useContext, useState, useEffect } = React
 
 interface SettingsContextType {
-  systemName: string
-  setSystemName: (name: string) => void
+     systemName: string
+     setSystemName: (name: string) => void
+     userName: string
+     setUserName: (name: string) => void
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [systemName, setSystemNameState] = useState("TaskManager")
+     const [systemName, setSystemNameState] = useState("TaskManager")
+     const [userName, setUserNameState] = useState("")
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("system-name")
-    if (saved) {
-      setSystemNameState(saved)
-    }
-  }, [])
+     // Load from localStorage on mount
+     useEffect(() => {
+          const saved = localStorage.getItem("system-name")
+          if (saved) {
+               setSystemNameState(saved)
+          }
+          const savedUserName = localStorage.getItem("user-name")
+          if (savedUserName) {
+               setUserNameState(savedUserName)
+          }
+     }, [])
 
-  const setSystemName = (name: string) => {
-    setSystemNameState(name)
-    localStorage.setItem("system-name", name)
-  }
+     const setSystemName = (name: string) => {
+          setSystemNameState(name)
+          localStorage.setItem("system-name", name)
+     }
 
-  return (
-    <SettingsContext.Provider value={{ systemName, setSystemName }}>
-      {children}
-    </SettingsContext.Provider>
-  )
+     const setUserName = (name: string) => {
+          setUserNameState(name)
+          localStorage.setItem("user-name", name)
+     }
+
+     return (
+          <SettingsContext.Provider value={{ systemName, setSystemName, userName, setUserName }}>
+               {children}
+          </SettingsContext.Provider>
+     )
 }
 
 export function useSettings() {
-  const context = useContext(SettingsContext)
-  if (context === undefined) {
-    // Fallback to default values if provider is not available
-    return {
-      systemName: "TaskManager",
-      setSystemName: () => {}
-    }
-  }
-  return context
+     const context = useContext(SettingsContext)
+     if (context === undefined) {
+          // Fallback to default values if provider is not available
+          return {
+               systemName: "TaskManager",
+               setSystemName: () => { },
+               userName: "",
+               setUserName: () => { }
+          }
+     }
+     return context
 }
