@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Plus, Edit, Trash2, Calendar, Clock, Flag, CheckSquare, Eye, LayoutGrid, List } from "lucide-react"
+import { Plus, Edit2, Trash2, Calendar, Clock, Flag, CheckSquare, Eye, LayoutGrid, List } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
@@ -17,12 +17,18 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+
 import {
-     DropdownMenu,
-     DropdownMenuContent,
-     DropdownMenuItem,
-     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+     AlertDialog,
+     AlertDialogAction,
+     AlertDialogCancel,
+     AlertDialogContent,
+     AlertDialogDescription,
+     AlertDialogFooter,
+     AlertDialogHeader,
+     AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface Task {
      id: string
@@ -70,8 +76,10 @@ export default function Tasks() {
      const [isCreateOpen, setIsCreateOpen] = useState(false)
      const [isEditOpen, setIsEditOpen] = useState(false)
      const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
      const [viewingTask, setViewingTask] = useState<Task | null>(null)
      const [editingTask, setEditingTask] = useState<Task | null>(null)
+     const [deletingTask, setDeletingTask] = useState<Task | null>(null)
      const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
 
      const [formData, setFormData] = useState<{
@@ -321,16 +329,21 @@ export default function Tasks() {
           }
      }
 
-     const handleDelete = async (taskId: string) => {
+     const handleDeleteClick = (task: Task) => {
+          setDeletingTask(task)
+          setIsDeleteOpen(true)
+     }
+     const handleDeleteConfirm = async () => {
+          if (!deletingTask) return
           try {
                const { error } = await supabase
                     .from('tasks')
                     .delete()
-                    .eq('id', taskId)
+                    .eq('id', deletingTask.id)
 
                if (error) throw error
 
-               setTasks(prev => prev.filter(task => task.id !== taskId))
+               setTasks(prev => prev.filter(task => task.id !== deletingTask.id))
 
                toast({
                     title: "Task excluída",
@@ -343,6 +356,9 @@ export default function Tasks() {
                     description: "Não foi possível excluir a task",
                     variant: "destructive"
                })
+          } finally {
+               setIsDeleteOpen(false)
+               setDeletingTask(null)
           }
      }
 
@@ -718,33 +734,58 @@ export default function Tasks() {
                                                                            task.status === 'in-progress' ? 'Em progresso' : 'Concluída'}
                                                                  </Badge>
 
-                                                                 <Button
-                                                                      variant="ghost"
-                                                                      size="sm"
-                                                                      onClick={() => handleViewDetails(task)}
-                                                                      title="Visualizar detalhes"
-                                                                 >
-                                                                      <Eye className="w-4 h-4" />
-                                                                 </Button>
+                                                                 <TooltipProvider>
+                                                                      <div className="flex items-center gap-1">
+                                                                           <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                     <Button
+                                                                                          variant="ghost"
+                                                                                          size="sm"
+                                                                                          onClick={() => handleViewDetails(task)}
+                                                                                          className="h-8 w-8 p-0"
+                                                                                     >
+                                                                                          <Eye className="w-4 h-4 text-foreground" />
+                                                                                     </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                     <p>Visualizar</p>
+                                                                                </TooltipContent>
+                                                                           </Tooltip>
 
-                                                                 <DropdownMenu>
-                                                                      <DropdownMenuTrigger asChild>
-                                                                           <Button variant="ghost" size="sm">
-                                                                                <Edit className="w-4 h-4" />
-                                                                           </Button>
-                                                                      </DropdownMenuTrigger>
-                                                                      <DropdownMenuContent align="end" className="z-50">
-                                                                           <DropdownMenuItem onClick={() => openEditDialog(task)}>
-                                                                                Editar Task
-                                                                           </DropdownMenuItem>
-                                                                           <DropdownMenuItem
-                                                                                className="text-destructive"
-                                                                                onClick={() => handleDelete(task.id)}
-                                                                           >
-                                                                                Excluir Task
-                                                                           </DropdownMenuItem>
-                                                                      </DropdownMenuContent>
-                                                                 </DropdownMenu>
+                                                                           <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                     <Button
+                                                                                          variant="ghost"
+                                                                                          size="sm"
+                                                                                          onClick={() => openEditDialog(task)}
+                                                                                          className="h-8 w-8 p-0"
+                                                                                     >
+                                                                                          <Edit2 className="w-4 h-4 text-foreground" />
+                                                                                     </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                     <p>Editar</p>
+                                                                                </TooltipContent>
+                                                                           </Tooltip>
+
+                                                                           <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                     <Button
+                                                                                          variant="ghost"
+                                                                                          size="sm"
+                                                                                          onClick={() => handleDeleteClick(task)}
+                                                                                          className="h-8 w-8 p-0"
+                                                                                     >
+                                                                                          <Trash2 className="w-4 h-4 text-destructive" />
+                                                                                     </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                     <p>Excluir</p>
+                                                                                </TooltipContent>
+                                                                           </Tooltip>
+                                                                      </div>
+                                                                 </TooltipProvider>
+
                                                             </div>
                                                        </div>
                                                   </CardContent>
@@ -809,33 +850,58 @@ export default function Tasks() {
                                                                                 task.status === 'in-progress' ? 'Em progresso' : 'Concluída'}
                                                                       </Badge>
 
-                                                                      <Button
-                                                                           variant="ghost"
-                                                                           size="sm"
-                                                                           onClick={() => handleViewDetails(task)}
-                                                                           title="Visualizar detalhes"
-                                                                      >
-                                                                           <Eye className="w-4 h-4" />
-                                                                      </Button>
+                                                                      <TooltipProvider>
+                                                                           <div className="flex items-center gap-1">
+                                                                                <Tooltip>
+                                                                                     <TooltipTrigger asChild>
+                                                                                          <Button
+                                                                                               variant="ghost"
+                                                                                               size="sm"
+                                                                                               onClick={() => handleViewDetails(task)}
+                                                                                               className="h-8 w-8 p-0"
+                                                                                          >
+                                                                                               <Eye className="w-4 h-4 text-foreground" />
+                                                                                          </Button>
+                                                                                     </TooltipTrigger>
+                                                                                     <TooltipContent>
+                                                                                          <p>Visualizar</p>
+                                                                                     </TooltipContent>
+                                                                                </Tooltip>
 
-                                                                      <DropdownMenu>
-                                                                           <DropdownMenuTrigger asChild>
-                                                                                <Button variant="ghost" size="sm">
-                                                                                     <Edit className="w-4 h-4" />
-                                                                                </Button>
-                                                                           </DropdownMenuTrigger>
-                                                                           <DropdownMenuContent align="end" className="z-50">
-                                                                                <DropdownMenuItem onClick={() => openEditDialog(task)}>
-                                                                                     Editar Task
-                                                                                </DropdownMenuItem>
-                                                                                <DropdownMenuItem
-                                                                                     className="text-destructive"
-                                                                                     onClick={() => handleDelete(task.id)}
-                                                                                >
-                                                                                     Excluir Task
-                                                                                </DropdownMenuItem>
-                                                                           </DropdownMenuContent>
-                                                                      </DropdownMenu>
+                                                                                <Tooltip>
+                                                                                     <TooltipTrigger asChild>
+                                                                                          <Button
+                                                                                               variant="ghost"
+                                                                                               size="sm"
+                                                                                               onClick={() => openEditDialog(task)}
+                                                                                               className="h-8 w-8 p-0"
+                                                                                          >
+                                                                                               <Edit2 className="w-4 h-4 text-foreground" />
+                                                                                          </Button>
+                                                                                     </TooltipTrigger>
+                                                                                     <TooltipContent>
+                                                                                          <p>Editar</p>
+                                                                                     </TooltipContent>
+                                                                                </Tooltip>
+
+                                                                                <Tooltip>
+                                                                                     <TooltipTrigger asChild>
+                                                                                          <Button
+                                                                                               variant="ghost"
+                                                                                               size="sm"
+                                                                                               onClick={() => handleDeleteClick(task)}
+                                                                                               className="h-8 w-8 p-0"
+                                                                                          >
+                                                                                               <Trash2 className="w-4 h-4 text-destructive" />
+                                                                                          </Button>
+                                                                                     </TooltipTrigger>
+                                                                                     <TooltipContent>
+                                                                                          <p>Excluir</p>
+                                                                                     </TooltipContent>
+                                                                                </Tooltip>
+                                                                           </div>
+                                                                      </TooltipProvider>
+
                                                                  </div>
                                                             </div>
                                                        </div>
@@ -981,6 +1047,43 @@ export default function Tasks() {
                                         </div>
                                    </DialogContent>
                               </Dialog>
+
+
+                              {/* Delete Confirmation Dialog */}
+                              <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+                                   <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                             <div className="flex items-center gap-3 mb-2">
+                                                  <div className="p-2 bg-destructive/10 rounded-lg">
+                                                       <Trash2 className="w-5 h-5 text-destructive" />
+                                                  </div>
+                                                  <div>
+                                                       <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                                  </div>
+                                             </div>
+                                             <AlertDialogDescription>
+                                                  Tem certeza que deseja excluir a tarefa <span className="font-semibold">"{deletingTask?.title}"</span>?
+                                                  {deletingTask?.subtasks && deletingTask.subtasks.length > 0 && (
+                                                       <span className="block mt-2 text-warning">
+                                                            Esta ação também excluirá {deletingTask.subtasks.length} subtarefa(s) associada(s).
+                                                       </span>
+                                                  )}
+                                                  <span className="block mt-2">
+                                                       Esta ação não pode ser desfeita.
+                                                  </span>
+                                             </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                             <AlertDialogAction
+                                                  onClick={handleDeleteConfirm}
+                                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                             >
+                                                  Excluir
+                                             </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                   </AlertDialogContent>
+                              </AlertDialog>
                          </div>
                     </main>
                </div>

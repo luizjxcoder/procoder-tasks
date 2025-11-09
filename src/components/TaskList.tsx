@@ -3,13 +3,8 @@ import { useNavigate } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { Calendar, Clock, Flag, MoreVertical } from "lucide-react"
-import {
-     DropdownMenu,
-     DropdownMenuContent,
-     DropdownMenuItem,
-     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Calendar, Clock, Flag, Eye, Edit2, Trash2 } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface Task {
      id: string
@@ -24,6 +19,8 @@ interface Task {
 interface TaskListProps {
      tasks: Task[]
      onTaskUpdate: (taskId: string, updates: Partial<Task>) => void
+     onTaskDelete?: (taskId: string) => void
+     onTaskEdit?: (taskId: string) => void
 }
 
 const priorityColors = {
@@ -43,7 +40,7 @@ const truncateText = (text: string, maxLength: number = 40) => {
      return text.substring(0, maxLength) + "..."
 }
 
-export function TaskList({ tasks, onTaskUpdate }: TaskListProps) {
+export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit }: TaskListProps) {
      const navigate = useNavigate()
      const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set())
 
@@ -118,27 +115,71 @@ export function TaskList({ tasks, onTaskUpdate }: TaskListProps) {
 
                                    <Badge
                                         variant="secondary"
-                                        className={`${statusColors[task.status]} text-white`}
+                                        className={`${statusColors[task.status]} text-white flex-shrink-0`}
                                    >
                                         {task.status === "in-progress" ? "In Progress" : task.status}
                                    </Badge>
 
-                                   <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                             <Button
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  onClick={(e) => e.stopPropagation()}
-                                             >
-                                                  <MoreVertical className="w-4 h-4" />
-                                             </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                             <DropdownMenuItem>Edit Task</DropdownMenuItem>
-                                             <DropdownMenuItem>Change Priority</DropdownMenuItem>
-                                             <DropdownMenuItem className="text-destructive">Delete Task</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                   </DropdownMenu>
+                                   <TooltipProvider>
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                             <Tooltip>
+                                                  <TooltipTrigger asChild>
+                                                       <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={(e) => {
+                                                                 e.stopPropagation()
+                                                                 navigate('/tasks')
+                                                            }}
+                                                            className="h-8 w-8 p-0"
+                                                       >
+                                                            <Eye className="w-4 h-4 text-foreground" />
+                                                       </Button>
+                                                  </TooltipTrigger>
+                                                  <TooltipContent>
+                                                       <p>Visualizar</p>
+                                                  </TooltipContent>
+                                             </Tooltip>
+
+                                             <Tooltip>
+                                                  <TooltipTrigger asChild>
+                                                       <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={(e) => {
+                                                                 e.stopPropagation()
+                                                                 onTaskEdit?.(task.id)
+                                                            }}
+                                                            className="h-8 w-8 p-0"
+                                                       >
+                                                            <Edit2 className="w-4 h-4 text-foreground" />
+                                                       </Button>
+                                                  </TooltipTrigger>
+                                                  <TooltipContent>
+                                                       <p>Editar</p>
+                                                  </TooltipContent>
+                                             </Tooltip>
+
+                                             <Tooltip>
+                                                  <TooltipTrigger asChild>
+                                                       <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={(e) => {
+                                                                 e.stopPropagation()
+                                                                 onTaskDelete?.(task.id)
+                                                            }}
+                                                            className="h-8 w-8 p-0"
+                                                       >
+                                                            <Trash2 className="w-4 h-4 text-destructive" />
+                                                       </Button>
+                                                  </TooltipTrigger>
+                                                  <TooltipContent>
+                                                       <p>Excluir</p>
+                                                  </TooltipContent>
+                                             </Tooltip>
+                                        </div>
+                                   </TooltipProvider>
                               </div>
                          )
                     })}
