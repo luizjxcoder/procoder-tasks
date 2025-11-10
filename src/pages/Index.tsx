@@ -13,8 +13,8 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, TrendingUp, Users, Clock, Target } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
-import { useNavigate } from "react-router-dom" // ✅ Adicionado para navegação SPA
 import { useSettings } from "@/contexts/SettingsContext"
+
 // Mock data
 const projects = [
      {
@@ -85,7 +85,6 @@ const tasks = [
 const Index = () => {
      const { user } = useAuth()
      const { userName } = useSettings()
-     const navigate = useNavigate() // ✅ Substitui window.location.href
      const [userTasks, setUserTasks] = useState<any[]>(tasks)
      const [stats, setStats] = useState([
           { label: "Total de Projetos", value: "0", icon: Target, color: "text-primary" },
@@ -103,6 +102,7 @@ const Index = () => {
           try {
                setLoading(true)
 
+               // Buscar os 5 projetos mais recentes
                const { data: projectsData, error: projectsError } = await supabase
                     .from('projects')
                     .select('*')
@@ -114,6 +114,7 @@ const Index = () => {
 
                console.log('Projetos encontrados:', projectsData)
 
+               // Buscar tarefas (opcional)
                let tasksData: any[] = []
                try {
                     const { data, error } = await supabase
@@ -121,10 +122,12 @@ const Index = () => {
                          .select('*')
                          .eq('user_id', user.id)
                     if (!error && data) tasksData = data
+                    else if (error) console.warn('Erro ao buscar tarefas (ignorando):', error.message)
                } catch (e) {
-                    console.warn('Erro ao buscar tarefas:', e)
+                    console.warn('Falha inesperada ao buscar tarefas (ignorando):', e)
                }
 
+               // Buscar vendas (opcional)
                let salesData: any[] = []
                try {
                     const { data, error } = await supabase
@@ -132,15 +135,20 @@ const Index = () => {
                          .select('*')
                          .eq('user_id', user.id)
                     if (!error && data) salesData = data
+                    else if (error) console.warn('Erro ao buscar vendas (ignorando):', error.message)
                } catch (e) {
-                    console.warn('Erro ao buscar vendas:', e)
+                    console.warn('Falha inesperada ao buscar vendas (ignorando):', e)
                }
 
+               // Calcular estatísticas
                const totalProjects = projectsData?.length || 0
                const completedTasks = tasksData?.filter(task => task.status === 'completed').length || 0
                const activeTasks = tasksData?.filter(task => task.status !== 'completed').length || 0
+
+               // Calcular vendas
                const totalSales = salesData?.length || 0
 
+               // Atualizar estatísticas
                setStats([
                     { label: "Total de Projetos", value: totalProjects.toString(), icon: Target, color: "text-primary" },
                     { label: "Tarefas Concluídas", value: completedTasks.toString(), icon: TrendingUp, color: "text-success" },
@@ -148,6 +156,7 @@ const Index = () => {
                     { label: "Tarefas Ativas", value: activeTasks.toString(), icon: Clock, color: "text-warning" }
                ])
 
+               // Atualizar projetos (converter para formato esperado pelo ProjectCard)
                const formattedProjects = projectsData?.map(project => ({
                     title: project.title,
                     company: project.company || "Empresa",
@@ -156,14 +165,18 @@ const Index = () => {
                     completedTasks: project.completed_tasks || 0,
                     priority: project.priority as "high" | "medium" | "low",
                     dueDate: project.due_date ? new Date(project.due_date).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }) : "Sem data",
-                    team: [{ id: "1", name: "Você", avatar: user.email?.charAt(0).toUpperCase() || "U" }],
+                    team: [
+                         { id: "1", name: "Você", avatar: user.email?.charAt(0).toUpperCase() || "U" }
+                    ],
                     tags: ["Projeto"],
                     status: project.status as "active" | "completed" | "on-hold"
                })) || []
 
                setRealProjects(formattedProjects)
 
-               const formattedTasks = (tasksData || []).map(task => ({
+               // Atualizar tarefas para o TaskList e Calendar
+               const allTasks = tasksData || []
+               const formattedTasksForList = allTasks.slice(0, 3).map(task => ({
                     id: task.id,
                     title: task.title,
                     project: "Sistema",
@@ -173,7 +186,13 @@ const Index = () => {
                     estimatedTime: task.estimated_time || "N/A"
                }))
 
-               setUserTasks(formattedTasks)
+               const formattedTasksForCalendar = allTasks.map(task => ({
+                    ...task,
+                    due_date: task.due_date
+               }))
+
+               setUserTasks(formattedTasksForCalendar)
+
           } catch (error) {
                console.error('Erro ao buscar dados do dashboard:', error)
           } finally {
@@ -182,13 +201,16 @@ const Index = () => {
      }
 
      useEffect(() => {
-          if (user) fetchDashboardData()
+          if (user) {
+               fetchDashboardData()
+          }
      }, [user])
 
      const handleTaskUpdate = async (taskId: string, updates: any) => {
           if (!user) return
 
           try {
+               // Atualizar no banco de dados
                const { error } = await supabase
                     .from('tasks')
                     .update(updates)
@@ -197,7 +219,14 @@ const Index = () => {
 
                if (error) throw error
 
-               setUserTasks(prev => prev.map(task => task.id === taskId ? { ...task, ...updates } : task))
+               // Atualizar estado local
+               setUserTasks(prev =>
+                    prev.map(task =>
+                         task.id === taskId ? { ...task, ...updates } : task
+                    )
+               )
+
+               // Recarregar dados para atualizar estatísticas
                fetchDashboardData()
           } catch (error) {
                console.error('Erro ao atualizar tarefa:', error)
@@ -219,14 +248,12 @@ const Index = () => {
                                              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
                                                   {userName ? `Olá ${userName} - ` : ""}Dashboard
                                              </h1>
-                                             <p className="text-sm sm:text-base text-muted-foreground">
-                                                  Bem vindo de volta! Vamos ver o que há de novo em seus projetos.
-                                             </p>
+                                             <p className="text-sm sm:text-base text-muted-foreground">Welcome back! Here's what's happening with your projects.</p>
                                         </div>
                                    </div>
                                    <Button
                                         className="bg-gradient-primary hover:bg-gradient-primary/90 w-full sm:w-auto"
-                                        onClick={() => navigate('/projects')} // ✅ SPA routing seguro
+                                        onClick={() => window.location.href = '/projects'}
                                    >
                                         <Plus className="w-4 h-4 mr-2" />
                                         <span className="hidden sm:inline">New Project</span>
@@ -234,7 +261,7 @@ const Index = () => {
                                    </Button>
                               </div>
 
-                              {/* Stats */}
+                              {/* Stats Cards */}
                               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
                                    {stats.map((stat, index) => (
                                         <div key={index} className="bg-gradient-card border border-border rounded-xl p-6 shadow-card">
@@ -253,7 +280,7 @@ const Index = () => {
                                    ))}
                               </div>
 
-                              {/* CARD DE ALERTAS */}
+                              {/* Time Tracker and Alerts Row */}
                               <div className="mb-4 sm:mb-6">
                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                                         <TimeTracker />
@@ -261,9 +288,9 @@ const Index = () => {
                                    </div>
                               </div>
 
-                              {/* Main Grid */}
+                              {/* Main Content Grid */}
                               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-                                   {/* Projetos Recentes */}
+                                   {/* Left Column - Projects */}
                                    <div className="space-y-4 sm:space-y-6">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                              <h2 className="text-lg sm:text-xl font-semibold text-foreground">Projetos Recentes</h2>
@@ -273,7 +300,7 @@ const Index = () => {
                                                        <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            onClick={() => navigate('/projects')} // ✅ Atualizado
+                                                            onClick={() => window.location.href = '/projects'}
                                                             className="text-primary hover:text-primary/80"
                                                        >
                                                             Ver Todos
@@ -286,7 +313,7 @@ const Index = () => {
                                              <div className="text-center text-muted-foreground">Carregando projetos...</div>
                                         ) : realProjects.length > 0 ? (
                                              realProjects.map((project, index) => (
-                                                  <div key={index} className="cursor-pointer" onClick={() => navigate('/projects')}>
+                                                  <div key={index} className="cursor-pointer" onClick={() => window.location.href = '/projects'}>
                                                        <ProjectCard {...project} />
                                                   </div>
                                              ))
@@ -295,7 +322,7 @@ const Index = () => {
                                                   <p>Nenhum projeto encontrado.</p>
                                                   <Button
                                                        className="mt-4 bg-gradient-primary hover:bg-gradient-primary/90"
-                                                       onClick={() => navigate('/projects')}
+                                                       onClick={() => window.location.href = '/projects'}
                                                   >
                                                        <Plus className="w-4 h-4 mr-2" />
                                                        Criar Primeiro Projeto
@@ -304,17 +331,28 @@ const Index = () => {
                                         )}
                                    </div>
 
-                                   {/* Tarefas e Calendário */}
+                                   {/* Right Column - Tasks and Calendar */}
                                    <div className="space-y-4 sm:space-y-6">
                                         <TaskList
-                                             tasks={userTasks.slice(0, 6)}
+                                             tasks={userTasks.slice(0, 6).map(task => ({
+                                                  id: task.id,
+                                                  title: task.title,
+                                                  project: "Sistema",
+                                                  priority: task.priority,
+                                                  dueDate: task.due_date ? new Date(task.due_date).toLocaleDateString('pt-BR') : "Sem data",
+                                                  status: task.status,
+                                                  estimatedTime: task.estimated_time || "N/A"
+                                             }))}
                                              onTaskUpdate={handleTaskUpdate}
+                                             showEditDelete={false}
                                         />
+
+                                        {/* Calendar Widget */}
                                         <CalendarWidget tasks={userTasks} />
                                    </div>
                               </div>
 
-                              {/* Notas e Atividade de Vendas */}
+                              {/* Bottom Row - Notes and Recent Sales */}
                               <div className="mt-4 sm:mt-6">
                                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                                         <NotesWidget />

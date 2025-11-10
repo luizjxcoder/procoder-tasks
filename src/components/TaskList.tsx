@@ -21,6 +21,7 @@ interface TaskListProps {
      onTaskUpdate: (taskId: string, updates: Partial<Task>) => void
      onTaskDelete?: (taskId: string) => void
      onTaskEdit?: (taskId: string) => void
+     showEditDelete?: boolean
 }
 
 const priorityColors = {
@@ -40,7 +41,7 @@ const truncateText = (text: string, maxLength: number = 40) => {
      return text.substring(0, maxLength) + "..."
 }
 
-export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit }: TaskListProps) {
+export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit, showEditDelete = true }: TaskListProps) {
      const navigate = useNavigate()
      const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set())
 
@@ -141,43 +142,47 @@ export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit }: Task
                                                   </TooltipContent>
                                              </Tooltip>
 
-                                             <Tooltip>
-                                                  <TooltipTrigger asChild>
-                                                       <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={(e) => {
-                                                                 e.stopPropagation()
-                                                                 onTaskEdit?.(task.id)
-                                                            }}
-                                                            className="h-8 w-8 p-0"
-                                                       >
-                                                            <Edit2 className="w-4 h-4 text-foreground" />
-                                                       </Button>
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>
-                                                       <p>Editar</p>
-                                                  </TooltipContent>
-                                             </Tooltip>
+                                             {showEditDelete && (
+                                                  <>
+                                                       <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={(e) => {
+                                                                           e.stopPropagation()
+                                                                           onTaskEdit?.(task.id)
+                                                                      }}
+                                                                      className="h-8 w-8 p-0"
+                                                                 >
+                                                                      <Edit2 className="w-4 h-4 text-foreground" />
+                                                                 </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                 <p>Editar</p>
+                                                            </TooltipContent>
+                                                       </Tooltip>
 
-                                             <Tooltip>
-                                                  <TooltipTrigger asChild>
-                                                       <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={(e) => {
-                                                                 e.stopPropagation()
-                                                                 onTaskDelete?.(task.id)
-                                                            }}
-                                                            className="h-8 w-8 p-0"
-                                                       >
-                                                            <Trash2 className="w-4 h-4 text-destructive" />
-                                                       </Button>
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>
-                                                       <p>Excluir</p>
-                                                  </TooltipContent>
-                                             </Tooltip>
+                                                       <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={(e) => {
+                                                                           e.stopPropagation()
+                                                                           onTaskDelete?.(task.id)
+                                                                      }}
+                                                                      className="h-8 w-8 p-0"
+                                                                 >
+                                                                      <Trash2 className="w-4 h-4 text-destructive" />
+                                                                 </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                 <p>Excluir</p>
+                                                            </TooltipContent>
+                                                       </Tooltip>
+                                                  </>
+                                             )}
                                         </div>
                                    </TooltipProvider>
                               </div>
