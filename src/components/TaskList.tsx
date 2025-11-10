@@ -65,7 +65,7 @@ export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit, showEd
                          variant="outline"
                          size="sm"
                          onClick={() => navigate('/tasks')}
-                         className="text-primary hover:text-primary/80 w-full sm:w-auto"
+                         className="text-primary hover:text-white w-full sm:w-auto"
                     >
                          Ver Todos
                     </Button>

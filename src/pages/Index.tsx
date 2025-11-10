@@ -89,8 +89,8 @@ const Index = () => {
      const [stats, setStats] = useState([
           { label: "Total de Projetos", value: "0", icon: Target, color: "text-primary" },
           { label: "Tarefas Concluídas", value: "0", icon: TrendingUp, color: "text-success" },
+          { label: "Tarefas + Subtarefas Ativas", value: "0", icon: Clock, color: "text-warning" },
           { label: "Total de Vendas", value: "0", icon: Users, color: "text-info" },
-          { label: "Tarefas Ativas", value: "0", icon: Clock, color: "text-warning" }
      ])
      const [realProjects, setRealProjects] = useState<any[]>([])
      const [loading, setLoading] = useState(true)
@@ -102,14 +102,13 @@ const Index = () => {
           try {
                setLoading(true)
 
-               // Buscar os 5 projetos mais recentes
+               // Buscar os 3 projetos mais recentes
                const { data: projectsData, error: projectsError } = await supabase
                     .from('projects')
                     .select('*')
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false })
-                    .limit(5)
-
+                    .limit(3)
                if (projectsError) throw projectsError
 
                console.log('Projetos encontrados:', projectsData)
@@ -152,8 +151,8 @@ const Index = () => {
                setStats([
                     { label: "Total de Projetos", value: totalProjects.toString(), icon: Target, color: "text-primary" },
                     { label: "Tarefas Concluídas", value: completedTasks.toString(), icon: TrendingUp, color: "text-success" },
+                    { label: "Tarefas + Subtarefas Ativas", value: activeTasks.toString(), icon: Clock, color: "text-warning" },
                     { label: "Total de Vendas", value: totalSales.toString(), icon: Users, color: "text-info" },
-                    { label: "Tarefas Ativas", value: activeTasks.toString(), icon: Clock, color: "text-warning" }
                ])
 
                // Atualizar projetos (converter para formato esperado pelo ProjectCard)
@@ -301,7 +300,7 @@ const Index = () => {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() => window.location.href = '/projects'}
-                                                            className="text-primary hover:text-primary/80"
+                                                            className="text-primary hover:text-white"
                                                        >
                                                             Ver Todos
                                                        </Button>

@@ -102,7 +102,7 @@ export function TaskManagerSidebar() {
                     <div className="mb-8 flex items-center gap-3">
                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
                               <img
-                                   src="/lovable-uploads/f11bb6d6-1c0f-4aa0-a897-7bb6abaf8a4e.png"
+                                   src="/lovable-uploads/minhaLogo.png"
                                    alt="Logo"
                                    className="w-full h-full object-contain"
                               />
