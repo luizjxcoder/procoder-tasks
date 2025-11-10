@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { TrendingUp, DollarSign, User, Calendar } from "lucide-react"
@@ -166,14 +167,15 @@ export function RecentSalesActivity() {
                {/* Footer */}
                {activities.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border">
-                         <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full h-8 text-xs"
-                              onClick={() => window.location.href = '/sales'}
-                         >
-                              Ver todas as vendas
-                         </Button>
+                         <Link to="/sales" className="block">
+                              <Button
+                                   variant="ghost"
+                                   size="sm"
+                                   className="w-full h-8 text-xs"
+                              >
+                                   Ver todas as vendas
+                              </Button>
+                         </Link>
                     </div>
                )}
           </div>
