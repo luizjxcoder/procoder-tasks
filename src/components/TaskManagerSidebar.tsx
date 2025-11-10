@@ -8,7 +8,8 @@ import {
      Settings,
      LogOut,
      DollarSign,
-     Users
+     Users,
+     UserCircle
 } from "lucide-react"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
@@ -48,6 +49,7 @@ export function TaskManagerSidebar() {
           { title: "Calendário", url: "/calendar", icon: Calendar },
           { title: "Notas", url: "/notes", icon: BookOpen },
           { title: "Vendas", url: "/sales", icon: DollarSign },
+          { title: "Clientes", url: "/customers", icon: UserCircle },
           { title: "Relatórios", url: "/reports", icon: FileText },
      ]
 
@@ -99,11 +101,11 @@ export function TaskManagerSidebar() {
                     {/* Logo */}
                     <div className="mb-8 flex items-center gap-3">
                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
-
-                              <img src={`${import.meta.env.BASE_URL}lovable-uploads/minhaLogo.png`} alt="Logo"
+                              <img
+                                   src="/lovable-uploads/f11bb6d6-1c0f-4aa0-a897-7bb6abaf8a4e.png"
+                                   alt="Logo"
                                    className="w-full h-full object-contain"
                               />
-
                          </div>
                          {!collapsed && (
                               <h1 className="text-xl font-bold text-sidebar-foreground">{systemName}</h1>

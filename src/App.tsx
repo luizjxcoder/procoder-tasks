@@ -14,6 +14,7 @@ import Notes from "./pages/Notes"
 import Reports from "./pages/Reports"
 import Settings from "./pages/Settings"
 import Sales from "./pages/Sales"
+import Customers from "./pages/Customers"
 import Auth from "./pages/Auth"
 import UserManagement from "./pages/UserManagement"
 import NotFound from "./pages/NotFound"
@@ -110,6 +111,14 @@ const App = () => (
                                              element={
                                                   <ProtectedRoute>
                                                        <Sales />
+                                                  </ProtectedRoute>
+                                             }
+                                        />
+                                        <Route
+                                             path="/customers"
+                                             element={
+                                                  <ProtectedRoute>
+                                                       <Customers />
                                                   </ProtectedRoute>
                                              }
                                         />
