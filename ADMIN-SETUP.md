@@ -151,9 +151,11 @@ Verifique usuários na página de administração ou diretamente no:
 Para dúvidas técnicas sobre o sistema, entre em contato com o desenvolvedor.
 
 ## FLUXO PUBLICAR GITHUB PAGES:
+
 npm run build        # gera o dist atualizado**
 git add .
 git commit -m "build atualizado"
 git push origin master   # envia o código-fonte atualizado
 npm run deploy           # publica o dist no branch gh-pages
+
 

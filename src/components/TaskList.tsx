@@ -78,30 +78,25 @@ export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit, showEd
                          return (
                               <div
                                    key={task.id}
-                                   className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-border transition-all duration-300 hover:bg-secondary/20 cursor-pointer ${isCompleted ? "opacity-60" : ""
+                                   className={`flex items-center gap-2 sm:gap-3 px-2 sm:px-3 rounded-lg border border-border transition-all duration-300 hover:bg-secondary/20 cursor-pointer h-[60px] overflow-hidden ${isCompleted ? "opacity-60" : ""
                                         }`}
                                    onClick={() => navigate('/tasks')}
                               >
                                    <Checkbox
                                         checked={isCompleted}
                                         onCheckedChange={(checked) => handleTaskComplete(task.id, checked as boolean)}
-                                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-1 flex-shrink-0"
+                                        className="data-[state=checked]:bg-primary data-[state=checked]:border-primary flex-shrink-0"
                                         onClick={(e) => e.stopPropagation()}
                                    />
 
-                                   <div className="flex-1 min-w-0">
-                                        <div className="flex items-start justify-between gap-2 mb-2">
-                                             <h3 className={`font-medium text-sm sm:text-base text-card-foreground ${isCompleted ? "line-through" : ""}`}>
-                                                  {truncateText(task.title)}
-                                             </h3>
-                                             <div className={`flex items-center gap-1 px-2 py-1 rounded-full bg-muted flex-shrink-0`}>
-                                                  <Flag className={`w-3 h-3 ${priorityColors[task.priority]}`} />
-                                             </div>
-                                        </div>
+                                   <div className="flex-1 min-w-0 overflow-hidden">
+                                        <h3 className={`font-medium text-sm text-card-foreground truncate ${isCompleted ? "line-through" : ""}`}>
+                                             {task.title}
+                                        </h3>
 
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                                             <span className="font-medium">{task.project}</span>
-                                             <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                                             <span className="font-medium truncate max-w-[100px]">{task.project}</span>
+                                             <div className="flex items-center gap-2 flex-shrink-0">
                                                   <div className="flex items-center gap-1">
                                                        <Calendar className="w-3 h-3" />
                                                        <span>{task.dueDate}</span>
@@ -111,6 +106,12 @@ export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit, showEd
                                                        <span>{task.estimatedTime}</span>
                                                   </div>
                                              </div>
+                                        </div>
+                                   </div>
+
+                                   <div className="flex items-center gap-1 flex-shrink-0">
+                                        <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted">
+                                             <Flag className={`w-3 h-3 ${priorityColors[task.priority]}`} />
                                         </div>
                                    </div>
 
