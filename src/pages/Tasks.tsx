@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
-import { Plus, Edit2, Trash2, Calendar, Clock, Flag, CheckSquare, Eye, LayoutGrid, List } from "lucide-react"
+import { Plus, Edit2, Trash2, Calendar, Clock, Flag, CheckSquare, Eye, LayoutGrid, List, Columns3 } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { TaskDetailsModal } from "@/components/TaskDetailsModal"
 import { SubtaskManager } from "@/components/SubtaskManager"
+import { KanbanBoard } from "@/components/KanbanBoard"
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { TaskManagerSidebar } from "@/components/TaskManagerSidebar"
@@ -18,7 +19,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-
 import {
      AlertDialog,
      AlertDialogAction,
@@ -80,7 +80,7 @@ export default function Tasks() {
      const [viewingTask, setViewingTask] = useState<Task | null>(null)
      const [editingTask, setEditingTask] = useState<Task | null>(null)
      const [deletingTask, setDeletingTask] = useState<Task | null>(null)
-     const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
+     const [viewMode, setViewMode] = useState<'cards' | 'list' | 'kanban'>('cards')
 
      const [formData, setFormData] = useState<{
           title: string
@@ -333,8 +333,10 @@ export default function Tasks() {
           setDeletingTask(task)
           setIsDeleteOpen(true)
      }
+
      const handleDeleteConfirm = async () => {
           if (!deletingTask) return
+
           try {
                const { error } = await supabase
                     .from('tasks')
@@ -373,7 +375,12 @@ export default function Tasks() {
 
                if (error) throw error
 
-               setTasks(prev => prev.map(task => task.id === taskId ? data as Task : task))
+               // Preserve subtasks when updating status
+               setTasks(prev => prev.map(task =>
+                    task.id === taskId
+                         ? { ...data as Task, subtasks: task.subtasks }
+                         : task
+               ))
           } catch (error) {
                console.error('Error updating task status:', error)
                toast({
@@ -499,8 +506,8 @@ export default function Tasks() {
                                                   onClick={() => setViewMode('cards')}
                                                   className="h-8"
                                              >
-                                                  <LayoutGrid className="w-4 h-4 mr-2" />
-                                                  Cards
+                                                  <LayoutGrid className="w-4 h-4 sm:mr-2" />
+                                                  <span className="hidden sm:inline">Cards</span>
                                              </Button>
                                              <Button
                                                   variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -508,8 +515,17 @@ export default function Tasks() {
                                                   onClick={() => setViewMode('list')}
                                                   className="h-8"
                                              >
-                                                  <List className="w-4 h-4 mr-2" />
-                                                  Lista
+                                                  <List className="w-4 h-4 sm:mr-2" />
+                                                  <span className="hidden sm:inline">Lista</span>
+                                             </Button>
+                                             <Button
+                                                  variant={viewMode === 'kanban' ? 'default' : 'ghost'}
+                                                  size="sm"
+                                                  onClick={() => setViewMode('kanban')}
+                                                  className="h-8"
+                                             >
+                                                  <Columns3 className="w-4 h-4 sm:mr-2" />
+                                                  <span className="hidden sm:inline">Kanban</span>
                                              </Button>
                                         </div>
 
@@ -650,158 +666,44 @@ export default function Tasks() {
                                    </div>
                               </div>
 
-                              {/* Tasks Grid */}
-                              <div className={viewMode === 'cards' ? 'grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6' : 'grid gap-4 sm:gap-6'}>
-                                   {tasks.length === 0 ? (
-                                        <Card className={viewMode === 'cards' ? 'col-span-full' : ''}>
-                                             <CardContent className="flex flex-col items-center justify-center py-12">
-                                                  <CheckSquare className="w-12 h-12 text-muted-foreground mb-4" />
-                                                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-                                                       Nenhuma task encontrada
-                                                  </h3>
-                                                  <p className="text-muted-foreground text-center mb-4">
-                                                       Comece criando sua primeira task
-                                                  </p>
-                                                  <Button onClick={() => setIsCreateOpen(true)}>
-                                                       <Plus className="w-4 h-4 mr-2" />
-                                                       Criar Task
-                                                  </Button>
-                                             </CardContent>
-                                        </Card>
-                                   ) : viewMode === 'cards' ? (
-                                        // Card View
-                                        tasks.map((task) => (
-                                             <Card
-                                                  key={task.id}
-                                                  className={`hover:shadow-md transition-colors border ${getDeadlineBorderColor(task.due_date)}`}
-                                             >
-                                                  <CardContent className="p-3 sm:p-6">
-                                                       <div className="flex items-start justify-between gap-3">
-                                                            <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-                                                                 <Checkbox
-                                                                      checked={task.status === 'completed'}
-                                                                      onCheckedChange={(checked) =>
-                                                                           handleStatusChange(task.id, checked ? 'completed' : 'todo')
-                                                                      }
-                                                                      className="mt-1 flex-shrink-0"
-                                                                 />
-
-                                                                 <div className="flex-1 min-w-0">
-                                                                      <div className="flex items-start justify-between gap-2 mb-2">
-                                                                           <h3 className={`font-semibold text-sm sm:text-lg break-words line-clamp-2 ${task.status === 'completed' ? 'line-through text-muted-foreground' : 'text-foreground'
-                                                                                }`}>
-                                                                                {task.title}
-                                                                           </h3>
-                                                                           <Flag className={`w-4 h-4 ${priorityColors[task.priority]} flex-shrink-0`} />
-                                                                      </div>
-
-                                                                      {task.description && (
-                                                                           <p className="text-muted-foreground mb-3 text-xs sm:text-sm">
-                                                                                {truncateText(task.description)}
-                                                                           </p>
-                                                                      )}
-
-                                                                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                                                                           <span className="font-medium">
-                                                                                {getProjectName(task.project_id)}
-                                                                           </span>
-
-                                                                           <div className="flex items-center gap-3">
-                                                                                {task.due_date && (
-                                                                                     <div className="flex items-center gap-1">
-                                                                                          <Calendar className="w-3 h-3" />
-                                                                                          <span>{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
-                                                                                     </div>
-                                                                                )}
-
-                                                                                {task.estimated_time && (
-                                                                                     <div className="flex items-center gap-1">
-                                                                                          <Clock className="w-3 h-3" />
-                                                                                          <span>{task.estimated_time}</span>
-                                                                                     </div>
-                                                                                )}
-                                                                           </div>
-                                                                      </div>
-                                                                 </div>
-                                                            </div>
-
-                                                            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 flex-shrink-0">
-                                                                 <Badge
-                                                                      variant="secondary"
-                                                                      className={`${statusColors[task.status]} text-white text-xs sm:text-sm`}
-                                                                 >
-                                                                      {task.status === 'todo' ? 'A fazer' :
-                                                                           task.status === 'in-progress' ? 'Em progresso' : 'Concluída'}
-                                                                 </Badge>
-
-                                                                 <TooltipProvider>
-                                                                      <div className="flex items-center gap-1">
-                                                                           <Tooltip>
-                                                                                <TooltipTrigger asChild>
-                                                                                     <Button
-                                                                                          variant="ghost"
-                                                                                          size="sm"
-                                                                                          onClick={() => handleViewDetails(task)}
-                                                                                          className="h-8 w-8 p-0"
-                                                                                     >
-                                                                                          <Eye className="w-4 h-4 text-foreground" />
-                                                                                     </Button>
-                                                                                </TooltipTrigger>
-                                                                                <TooltipContent>
-                                                                                     <p>Visualizar</p>
-                                                                                </TooltipContent>
-                                                                           </Tooltip>
-
-                                                                           <Tooltip>
-                                                                                <TooltipTrigger asChild>
-                                                                                     <Button
-                                                                                          variant="ghost"
-                                                                                          size="sm"
-                                                                                          onClick={() => openEditDialog(task)}
-                                                                                          className="h-8 w-8 p-0"
-                                                                                     >
-                                                                                          <Edit2 className="w-4 h-4 text-foreground" />
-                                                                                     </Button>
-                                                                                </TooltipTrigger>
-                                                                                <TooltipContent>
-                                                                                     <p>Editar</p>
-                                                                                </TooltipContent>
-                                                                           </Tooltip>
-
-                                                                           <Tooltip>
-                                                                                <TooltipTrigger asChild>
-                                                                                     <Button
-                                                                                          variant="ghost"
-                                                                                          size="sm"
-                                                                                          onClick={() => handleDeleteClick(task)}
-                                                                                          className="h-8 w-8 p-0"
-                                                                                     >
-                                                                                          <Trash2 className="w-4 h-4 text-destructive" />
-                                                                                     </Button>
-                                                                                </TooltipTrigger>
-                                                                                <TooltipContent>
-                                                                                     <p>Excluir</p>
-                                                                                </TooltipContent>
-                                                                           </Tooltip>
-                                                                      </div>
-                                                                 </TooltipProvider>
-
-                                                            </div>
-                                                       </div>
+                              {/* Tasks Content */}
+                              {viewMode === 'kanban' ? (
+                                   <KanbanBoard
+                                        tasks={tasks}
+                                        projects={projects}
+                                        onStatusChange={handleStatusChange}
+                                        onViewDetails={handleViewDetails}
+                                        onEdit={openEditDialog}
+                                        onDelete={handleDeleteClick}
+                                   />
+                              ) : (
+                                   <div className={viewMode === 'cards' ? 'grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6' : 'grid gap-4 sm:gap-6'}>
+                                        {tasks.length === 0 ? (
+                                             <Card className={viewMode === 'cards' ? 'col-span-full' : ''}>
+                                                  <CardContent className="flex flex-col items-center justify-center py-12">
+                                                       <CheckSquare className="w-12 h-12 text-muted-foreground mb-4" />
+                                                       <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+                                                            Nenhuma task encontrada
+                                                       </h3>
+                                                       <p className="text-muted-foreground text-center mb-4">
+                                                            Comece criando sua primeira task
+                                                       </p>
+                                                       <Button onClick={() => setIsCreateOpen(true)}>
+                                                            <Plus className="w-4 h-4 mr-2" />
+                                                            Criar Task
+                                                       </Button>
                                                   </CardContent>
                                              </Card>
-                                        ))
-                                   ) : (
-                                        // List View
-                                        <Card className="overflow-hidden">
-                                             <div className="divide-y divide-border">
-                                                  {tasks.map((task) => (
-                                                       <div
-                                                            key={task.id}
-                                                            className={`p-4 hover:bg-muted/50 transition-colors border-l-4 ${getDeadlineLeftBorderColor(task.due_date)}`}
-                                                       >
-                                                            <div className="flex items-center justify-between gap-4">
-                                                                 <div className="flex items-center gap-4 flex-1 min-w-0">
+                                        ) : viewMode === 'cards' ? (
+                                             // Card View
+                                             tasks.map((task) => (
+                                                  <Card
+                                                       key={task.id}
+                                                       className={`hover:shadow-md transition-colors border ${getDeadlineBorderColor(task.due_date)}`}
+                                                  >
+                                                       <CardContent className="p-2 sm:p-3 h-[60px] overflow-hidden">
+                                                            <div className="flex items-center justify-between gap-2 h-full">
+                                                                 <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
                                                                       <Checkbox
                                                                            checked={task.status === 'completed'}
                                                                            onCheckedChange={(checked) =>
@@ -810,38 +712,39 @@ export default function Tasks() {
                                                                            className="flex-shrink-0"
                                                                       />
 
-                                                                      <div className="flex-1 min-w-0">
-                                                                           <div className="flex items-center gap-2 mb-1">
-                                                                                <h3 className={`font-semibold text-sm sm:text-base break-words line-clamp-2 ${task.status === 'completed' ? 'line-through text-muted-foreground' : 'text-foreground'
-                                                                                     }`}>
-                                                                                     {task.title}
-                                                                                </h3>
-                                                                                <Flag className={`w-3 h-3 ${priorityColors[task.priority]} flex-shrink-0`} />
-                                                                           </div>
+                                                                      <div className="flex-1 min-w-0 overflow-hidden">
+                                                                           <h3 className={`font-semibold text-sm truncate ${task.status === 'completed' ? 'line-through text-muted-foreground' : 'text-foreground'
+                                                                                }`}>
+                                                                                {task.title}
+                                                                           </h3>
 
-                                                                           <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                                                                                <span className="font-medium">
+                                                                           <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                                                                                <span className="font-medium truncate max-w-[100px]">
                                                                                      {getProjectName(task.project_id)}
                                                                                 </span>
 
-                                                                                {task.due_date && (
-                                                                                     <div className="flex items-center gap-1">
-                                                                                          <Calendar className="w-3 h-3" />
-                                                                                          <span>{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
-                                                                                     </div>
-                                                                                )}
+                                                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                                                     {task.due_date && (
+                                                                                          <div className="flex items-center gap-1">
+                                                                                               <Calendar className="w-3 h-3" />
+                                                                                               <span>{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
+                                                                                          </div>
+                                                                                     )}
 
-                                                                                {task.estimated_time && (
-                                                                                     <div className="flex items-center gap-1">
-                                                                                          <Clock className="w-3 h-3" />
-                                                                                          <span>{task.estimated_time}</span>
-                                                                                     </div>
-                                                                                )}
+                                                                                     {task.estimated_time && (
+                                                                                          <div className="flex items-center gap-1">
+                                                                                               <Clock className="w-3 h-3" />
+                                                                                               <span>{task.estimated_time}</span>
+                                                                                          </div>
+                                                                                     )}
+                                                                                </div>
                                                                            </div>
                                                                       </div>
+
+                                                                      <Flag className={`w-3 h-3 ${priorityColors[task.priority]} flex-shrink-0`} />
                                                                  </div>
 
-                                                                 <div className="flex items-center gap-2 flex-shrink-0">
+                                                                 <div className="flex items-center gap-1 flex-shrink-0">
                                                                       <Badge
                                                                            variant="secondary"
                                                                            className={`${statusColors[task.status]} text-white text-xs`}
@@ -901,15 +804,131 @@ export default function Tasks() {
                                                                                 </Tooltip>
                                                                            </div>
                                                                       </TooltipProvider>
-
                                                                  </div>
                                                             </div>
-                                                       </div>
-                                                  ))}
-                                             </div>
-                                        </Card>
-                                   )}
-                              </div>
+                                                       </CardContent>
+                                                  </Card>
+                                             ))
+                                        ) : (
+                                             // List View
+                                             <Card className="overflow-hidden">
+                                                  <div className="divide-y divide-border">
+                                                       {tasks.map((task) => (
+                                                            <div
+                                                                 key={task.id}
+                                                                 className={`px-2 sm:px-3 hover:bg-muted/50 transition-colors border-l-4 h-[60px] overflow-hidden ${getDeadlineLeftBorderColor(task.due_date)}`}
+                                                            >
+                                                                 <div className="flex items-center justify-between gap-2 h-full">
+                                                                      <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                                                           <Checkbox
+                                                                                checked={task.status === 'completed'}
+                                                                                onCheckedChange={(checked) =>
+                                                                                     handleStatusChange(task.id, checked ? 'completed' : 'todo')
+                                                                                }
+                                                                                className="flex-shrink-0"
+                                                                           />
+
+                                                                           <div className="flex-1 min-w-0 overflow-hidden">
+                                                                                <h3 className={`font-semibold text-sm truncate ${task.status === 'completed' ? 'line-through text-muted-foreground' : 'text-foreground'
+                                                                                     }`}>
+                                                                                     {task.title}
+                                                                                </h3>
+
+                                                                                <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                                                                                     <span className="font-medium truncate max-w-[100px]">
+                                                                                          {getProjectName(task.project_id)}
+                                                                                     </span>
+
+                                                                                     <div className="flex items-center gap-2 flex-shrink-0">
+                                                                                          {task.due_date && (
+                                                                                               <div className="flex items-center gap-1">
+                                                                                                    <Calendar className="w-3 h-3" />
+                                                                                                    <span>{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
+                                                                                               </div>
+                                                                                          )}
+
+                                                                                          {task.estimated_time && (
+                                                                                               <div className="flex items-center gap-1">
+                                                                                                    <Clock className="w-3 h-3" />
+                                                                                                    <span>{task.estimated_time}</span>
+                                                                                               </div>
+                                                                                          )}
+                                                                                     </div>
+                                                                                </div>
+                                                                           </div>
+
+                                                                           <Flag className={`w-3 h-3 ${priorityColors[task.priority]} flex-shrink-0`} />
+                                                                      </div>
+
+                                                                      <div className="flex items-center gap-1 flex-shrink-0">
+                                                                           <Badge
+                                                                                variant="secondary"
+                                                                                className={`${statusColors[task.status]} text-white text-xs`}
+                                                                           >
+                                                                                {task.status === 'todo' ? 'A fazer' :
+                                                                                     task.status === 'in-progress' ? 'Em progresso' : 'Concluída'}
+                                                                           </Badge>
+
+                                                                           <TooltipProvider>
+                                                                                <div className="flex items-center gap-1">
+                                                                                     <Tooltip>
+                                                                                          <TooltipTrigger asChild>
+                                                                                               <Button
+                                                                                                    variant="ghost"
+                                                                                                    size="sm"
+                                                                                                    onClick={() => handleViewDetails(task)}
+                                                                                                    className="h-8 w-8 p-0"
+                                                                                               >
+                                                                                                    <Eye className="w-4 h-4 text-foreground" />
+                                                                                               </Button>
+                                                                                          </TooltipTrigger>
+                                                                                          <TooltipContent>
+                                                                                               <p>Visualizar</p>
+                                                                                          </TooltipContent>
+                                                                                     </Tooltip>
+
+                                                                                     <Tooltip>
+                                                                                          <TooltipTrigger asChild>
+                                                                                               <Button
+                                                                                                    variant="ghost"
+                                                                                                    size="sm"
+                                                                                                    onClick={() => openEditDialog(task)}
+                                                                                                    className="h-8 w-8 p-0"
+                                                                                               >
+                                                                                                    <Edit2 className="w-4 h-4 text-foreground" />
+                                                                                               </Button>
+                                                                                          </TooltipTrigger>
+                                                                                          <TooltipContent>
+                                                                                               <p>Editar</p>
+                                                                                          </TooltipContent>
+                                                                                     </Tooltip>
+
+                                                                                     <Tooltip>
+                                                                                          <TooltipTrigger asChild>
+                                                                                               <Button
+                                                                                                    variant="ghost"
+                                                                                                    size="sm"
+                                                                                                    onClick={() => handleDeleteClick(task)}
+                                                                                                    className="h-8 w-8 p-0"
+                                                                                               >
+                                                                                                    <Trash2 className="w-4 h-4 text-destructive" />
+                                                                                               </Button>
+                                                                                          </TooltipTrigger>
+                                                                                          <TooltipContent>
+                                                                                               <p>Excluir</p>
+                                                                                          </TooltipContent>
+                                                                                     </Tooltip>
+                                                                                </div>
+                                                                           </TooltipProvider>
+                                                                      </div>
+                                                                 </div>
+                                                            </div>
+                                                       ))}
+                                                  </div>
+                                             </Card>
+                                        )}
+                                   </div>
+                              )}
 
                               {/* Details Modal */}
                               <TaskDetailsModal
@@ -1047,7 +1066,6 @@ export default function Tasks() {
                                         </div>
                                    </DialogContent>
                               </Dialog>
-
 
                               {/* Delete Confirmation Dialog */}
                               <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
