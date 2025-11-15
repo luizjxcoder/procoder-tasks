@@ -16,42 +16,6 @@ import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
 import { useSettings } from "@/contexts/SettingsContext"
 
-const projects = [
-     {
-          title: "Logo Design",
-          company: "Google",
-          progress: 75,
-          totalTasks: 30,
-          completedTasks: 22,
-          priority: "high" as const,
-          dueDate: "Feb 20",
-          team: [
-               { id: "1", name: "John Doe", avatar: "JD" },
-               { id: "2", name: "Jane Smith", avatar: "JS" },
-               { id: "3", name: "Mike Wilson", avatar: "MW" },
-               { id: "4", name: "Sarah Connor", avatar: "SC" }
-          ],
-          tags: ["Design", "Branding", "iOS"],
-          status: "active" as const
-     },
-     {
-          title: "Dashboard Design",
-          company: "Slack",
-          progress: 45,
-          totalTasks: 25,
-          completedTasks: 11,
-          priority: "medium" as const,
-          dueDate: "Feb 25",
-          team: [
-               { id: "5", name: "Alex Turner", avatar: "AT" },
-               { id: "6", name: "Emma Watson", avatar: "EW" },
-               { id: "7", name: "David Brown", avatar: "DB" }
-          ],
-          tags: ["UI/UX", "Dashboard", "React"],
-          status: "active" as const
-     }
-]
-
 const tasks = [
      {
           id: "1",
@@ -85,7 +49,8 @@ const tasks = [
 const Index = () => {
      const { user } = useAuth()
      const { userName } = useSettings()
-     const navigate = useNavigate() // ✅ Hook adicionado aqui
+     const navigate = useNavigate()
+
      const [userTasks, setUserTasks] = useState<any[]>(tasks)
      const [stats, setStats] = useState([
           { label: "Total de Projetos", value: "0", icon: Target, color: "text-primary" },
@@ -93,46 +58,72 @@ const Index = () => {
           { label: "Tarefas + Subtarefas Ativas", value: "0", icon: Clock, color: "text-warning" },
           { label: "Total de Vendas", value: "0", icon: Users, color: "text-info" },
      ])
+
      const [realProjects, setRealProjects] = useState<any[]>([])
      const [loading, setLoading] = useState(true)
 
      const fetchDashboardData = async () => {
           if (!user) return
+
           try {
                setLoading(true)
-               const { data: projectsData, error: projectsError } = await supabase
-                    .from('projects')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .order('created_at', { ascending: false })
-                    .limit(3)
-               if (projectsError) throw projectsError
 
+               // -----------------------------
+               // 🔥 QUERY 1: BUSCAR TODOS PROJETOS (para total real)
+               // -----------------------------
+               const { data: allProjects, error: allProjectsError } = await supabase
+                    .from("projects")
+                    .select("*")
+                    .eq("user_id", user.id)
+
+               if (allProjectsError) throw allProjectsError
+
+               // -----------------------------
+               // 🔥 QUERY 2: TRAZER SÓ OS 3 MAIS RECENTES
+               // -----------------------------
+               const { data: recentProjects, error: recentProjectsError } = await supabase
+                    .from("projects")
+                    .select("*")
+                    .eq("user_id", user.id)
+                    .order("created_at", { ascending: false })
+                    .limit(3)
+
+               if (recentProjectsError) throw recentProjectsError
+
+               // -----------------------------
+               // 🔥 TAREFAS
+               // -----------------------------
                let tasksData: any[] = []
                try {
                     const { data, error } = await supabase
-                         .from('tasks')
-                         .select('*')
-                         .eq('user_id', user.id)
+                         .from("tasks")
+                         .select("*")
+                         .eq("user_id", user.id)
                     if (!error && data) tasksData = data
                } catch (e) {
-                    console.warn('Erro ao buscar tarefas:', e)
+                    console.warn("Erro ao buscar tarefas:", e)
                }
 
+               // -----------------------------
+               // 🔥 VENDAS
+               // -----------------------------
                let salesData: any[] = []
                try {
                     const { data, error } = await supabase
-                         .from('sales')
-                         .select('*')
-                         .eq('user_id', user.id)
+                         .from("sales")
+                         .select("*")
+                         .eq("user_id", user.id)
                     if (!error && data) salesData = data
                } catch (e) {
-                    console.warn('Erro ao buscar vendas:', e)
+                    console.warn("Erro ao buscar vendas:", e)
                }
 
-               const totalProjects = projectsData?.length || 0
-               const completedTasks = tasksData?.filter(t => t.status === 'completed').length || 0
-               const activeTasks = tasksData?.filter(t => t.status !== 'completed').length || 0
+               // -----------------------------
+               // 📊 ESTATÍSTICAS CORRETAS
+               // -----------------------------
+               const totalProjects = allProjects?.length || 0
+               const completedTasks = tasksData.filter(t => t.status === "completed").length
+               const activeTasks = tasksData.filter(t => t.status !== "completed").length
                const totalSales = salesData?.length || 0
 
                setStats([
@@ -142,7 +133,10 @@ const Index = () => {
                     { label: "Total de Vendas", value: totalSales.toString(), icon: Users, color: "text-info" },
                ])
 
-               const formattedProjects = projectsData?.map(project => ({
+               // -----------------------------
+               // 🗂 FORMATAR SÓ OS 3 RECENTES
+               // -----------------------------
+               const formattedProjects = recentProjects?.map(project => ({
                     title: project.title,
                     company: project.company || "Empresa",
                     progress: project.progress || 0,
@@ -150,21 +144,20 @@ const Index = () => {
                     completedTasks: project.completed_tasks || 0,
                     priority: project.priority as "high" | "medium" | "low",
                     dueDate: project.due_date
-                         ? new Date(project.due_date).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })
+                         ? new Date(project.due_date).toLocaleDateString("pt-BR", { month: "short", day: "numeric" })
                          : "Sem data",
                     team: [
-                         { id: "1", name: "Você", avatar: user.email?.charAt(0).toUpperCase() || "U" }
+                         { id: "1", name: "Você", avatar: user.email?.charAt(0).toUpperCase() || "U" },
                     ],
                     tags: ["Projeto"],
-                    status: project.status as "active" | "completed" | "on-hold"
+                    status: project.status as "active" | "completed" | "on-hold",
                })) || []
 
                setRealProjects(formattedProjects)
+               setUserTasks(tasksData)
 
-               const allTasks = tasksData || []
-               setUserTasks(allTasks)
           } catch (error) {
-               console.error('Erro ao buscar dados do dashboard:', error)
+               console.error("Erro no dashboard:", error)
           } finally {
                setLoading(false)
           }
@@ -178,15 +171,17 @@ const Index = () => {
           if (!user) return
           try {
                const { error } = await supabase
-                    .from('tasks')
+                    .from("tasks")
                     .update(updates)
-                    .eq('id', taskId)
-                    .eq('user_id', user.id)
+                    .eq("id", taskId)
+                    .eq("user_id", user.id)
+
                if (error) throw error
+
                setUserTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t))
                fetchDashboardData()
           } catch (error) {
-               console.error('Erro ao atualizar tarefa:', error)
+               console.error("Erro ao atualizar tarefa:", error)
           }
      }
 
@@ -197,6 +192,7 @@ const Index = () => {
                          <TaskManagerSidebar />
 
                          <main className="flex-1 p-3 sm:p-6">
+
                               {/* Header */}
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                                    <div className="flex items-center gap-4">
@@ -212,7 +208,7 @@ const Index = () => {
                                    </div>
                                    <Button
                                         className="bg-gradient-primary hover:bg-gradient-primary/90 w-full sm:w-auto"
-                                        onClick={() => navigate("/projects")} // ✅ SPA navigation
+                                        onClick={() => navigate("/projects")}
                                    >
                                         <Plus className="w-4 h-4 mr-2" />
                                         <span className="hidden sm:inline">New Project</span>
@@ -227,7 +223,9 @@ const Index = () => {
                                              <div className="flex items-center justify-between">
                                                   <div>
                                                        <p className="text-sm text-muted-foreground">{stat.label}</p>
-                                                       <p className="text-2xl font-bold text-card-foreground">{loading ? "..." : stat.value}</p>
+                                                       <p className="text-2xl font-bold text-card-foreground">
+                                                            {loading ? "..." : stat.value}
+                                                       </p>
                                                   </div>
                                                   <div className={`p-3 rounded-lg bg-secondary ${stat.color}`}>
                                                        <stat.icon className="w-6 h-6" />
@@ -294,7 +292,9 @@ const Index = () => {
                                                   title: task.title,
                                                   project: "Sistema",
                                                   priority: task.priority,
-                                                  dueDate: task.due_date ? new Date(task.due_date).toLocaleDateString('pt-BR') : "Sem data",
+                                                  dueDate: task.due_date
+                                                       ? new Date(task.due_date).toLocaleDateString("pt-BR")
+                                                       : "Sem data",
                                                   status: task.status,
                                                   estimatedTime: task.estimated_time || "N/A"
                                              }))}
