@@ -14,6 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
+      customers: {
+        Row: {
+          company_name: string | null
+          cpf_cnpj: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          rating: number | null
+          segment: string | null
+          social_media: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          rating?: number | null
+          segment?: string | null
+          social_media?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          rating?: number | null
+          segment?: string | null
+          social_media?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      design_briefings: {
+        Row: {
+          brand_assets: Json | null
+          brand_personality: string | null
+          brand_voice: string | null
+          client_name: string
+          color_palette: Json | null
+          conversion_goals: Json | null
+          created_at: string
+          design_inspiration: string | null
+          id: string
+          logo_url: string | null
+          main_objective: string | null
+          project_type: string
+          status: string
+          target_audience: string | null
+          title: string
+          typography_primary: string | null
+          typography_secondary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_assets?: Json | null
+          brand_personality?: string | null
+          brand_voice?: string | null
+          client_name: string
+          color_palette?: Json | null
+          conversion_goals?: Json | null
+          created_at?: string
+          design_inspiration?: string | null
+          id?: string
+          logo_url?: string | null
+          main_objective?: string | null
+          project_type: string
+          status?: string
+          target_audience?: string | null
+          title: string
+          typography_primary?: string | null
+          typography_secondary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_assets?: Json | null
+          brand_personality?: string | null
+          brand_voice?: string | null
+          client_name?: string
+          color_palette?: Json | null
+          conversion_goals?: Json | null
+          created_at?: string
+          design_inspiration?: string | null
+          id?: string
+          logo_url?: string | null
+          main_objective?: string | null
+          project_type?: string
+          status?: string
+          target_audience?: string | null
+          title?: string
+          typography_primary?: string | null
+          typography_secondary?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notes: {
         Row: {
           content: string | null

@@ -153,8 +153,8 @@ export const AlertsWidget = () => {
                               <div
                                    key={alert.id}
                                    className={`p-1.5 rounded border ${alert.overdue
-                                             ? 'border-destructive/20 bg-destructive/5'
-                                             : 'border-border bg-background/50'
+                                        ? 'border-destructive/20 bg-destructive/5'
+                                        : 'border-border bg-background/50'
                                         } hover:bg-background/80 transition-colors`}
                               >
                                    <div className="flex items-start justify-between">

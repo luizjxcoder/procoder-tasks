@@ -17,6 +17,7 @@ import Sales from "./pages/Sales"
 import Customers from "./pages/Customers"
 import Auth from "./pages/Auth"
 import UserManagement from "./pages/UserManagement"
+import DesignBriefings from "./pages/DesignBriefings"
 import NotFound from "./pages/NotFound"
 
 const queryClient = new QueryClient()
@@ -47,7 +48,7 @@ const App = () => (
                          <TooltipProvider>
                               <Toaster />
                               <Sonner />
-                              <BrowserRouter basename={import.meta.env.DEV ? "/" : "/procoder-tasks"}>
+                              <BrowserRouter>
                                    <Routes>
                                         <Route path="/auth" element={<Auth />} />
                                         <Route
@@ -127,6 +128,14 @@ const App = () => (
                                              element={
                                                   <ProtectedRoute>
                                                        <UserManagement />
+                                                  </ProtectedRoute>
+                                             }
+                                        />
+                                        <Route
+                                             path="/design-briefings"
+                                             element={
+                                                  <ProtectedRoute>
+                                                       <DesignBriefings />
                                                   </ProtectedRoute>
                                              }
                                         />
