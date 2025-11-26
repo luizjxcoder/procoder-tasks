@@ -9,6 +9,7 @@ import { NotesWidget } from "@/components/NotesWidget"
 import { TimeTracker } from "@/components/TimeTracker"
 import { AlertsWidget } from "@/components/AlertsWidget"
 import { RecentSalesActivity } from "@/components/RecentSalesActivity"
+import { RecentBriefings } from "@/components/RecentBriefings"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, TrendingUp, Users, Clock, Target } from "lucide-react"
@@ -311,6 +312,11 @@ const Index = () => {
                                         <NotesWidget />
                                         <RecentSalesActivity />
                                    </div>
+                              </div>
+
+                              {/* Briefings CARD */}
+                              <div className="mt-4 sm:mt-6">
+                                   <RecentBriefings />
                               </div>
                          </main>
                     </div>

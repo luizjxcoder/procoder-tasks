@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { TrendingUp, DollarSign, User, Calendar } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
@@ -31,7 +32,6 @@ export function RecentSalesActivity() {
                     .select('*')
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false })
-                    .limit(5)
 
                if (error) throw error
 
@@ -117,52 +117,54 @@ export function RecentSalesActivity() {
                </div>
 
                {/* Activities List */}
-               <div className="space-y-3">
-                    {loading ? (
-                         <div className="text-center text-muted-foreground text-sm">
-                              Carregando atividades...
-                         </div>
-                    ) : activities.length > 0 ? (
-                         activities.map((activity) => (
-                              <div key={activity.id} className="flex items-center justify-between p-2 rounded-lg bg-secondary/50 border border-border/50">
-                                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                                        <div className="p-1.5 rounded-full bg-primary/10">
-                                             <DollarSign className="w-3 h-3 text-primary" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                             <div className="flex items-center justify-between">
-                                                  <p className="text-sm font-medium text-card-foreground truncate">
-                                                       {activity.client_name}
-                                                  </p>
-                                                  <Badge className={`text-xs ${getStatusColor(activity.payment_status)}`}>
-                                                       {getStatusText(activity.payment_status)}
-                                                  </Badge>
+               <ScrollArea className="max-h-[420px] pr-4">
+                    <div className="space-y-3">
+                         {loading ? (
+                              <div className="text-center text-muted-foreground text-sm">
+                                   Carregando atividades...
+                              </div>
+                         ) : activities.length > 0 ? (
+                              activities.map((activity) => (
+                                   <div key={activity.id} className="flex items-center justify-between p-2 rounded-lg bg-secondary/50 border border-border/50">
+                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                             <div className="p-1.5 rounded-full bg-primary/10">
+                                                  <DollarSign className="w-3 h-3 text-primary" />
                                              </div>
-                                             <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                                  <span className="flex items-center gap-1">
-                                                       <User className="w-3 h-3" />
-                                                       {activity.project_name}
-                                                  </span>
-                                                  <span className="font-medium text-success">
-                                                       {formatCurrency(activity.sale_value)}
-                                                  </span>
-                                             </div>
-                                             <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                                                  <Calendar className="w-3 h-3" />
-                                                  {formatDate(activity.created_at)}
+                                             <div className="flex-1 min-w-0">
+                                                  <div className="flex items-center justify-between">
+                                                       <p className="text-sm font-medium text-card-foreground truncate">
+                                                            {activity.client_name}
+                                                       </p>
+                                                       <Badge className={`text-xs ${getStatusColor(activity.payment_status)}`}>
+                                                            {getStatusText(activity.payment_status)}
+                                                       </Badge>
+                                                  </div>
+                                                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                       <span className="flex items-center gap-1">
+                                                            <User className="w-3 h-3" />
+                                                            {activity.project_name}
+                                                       </span>
+                                                       <span className="font-medium text-success">
+                                                            {formatCurrency(activity.sale_value)}
+                                                       </span>
+                                                  </div>
+                                                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                                                       <Calendar className="w-3 h-3" />
+                                                       {formatDate(activity.created_at)}
+                                                  </div>
                                              </div>
                                         </div>
                                    </div>
+                              ))
+                         ) : (
+                              <div className="text-center text-muted-foreground text-sm py-4">
+                                   <DollarSign className="w-8 h-8 mx-auto mb-2 text-muted-foreground/50" />
+                                   <p>Nenhuma atividade recente</p>
+                                   <p className="text-xs">Suas vendas aparecerão aqui</p>
                               </div>
-                         ))
-                    ) : (
-                         <div className="text-center text-muted-foreground text-sm py-4">
-                              <DollarSign className="w-8 h-8 mx-auto mb-2 text-muted-foreground/50" />
-                              <p>Nenhuma atividade recente</p>
-                              <p className="text-xs">Suas vendas aparecerão aqui</p>
-                         </div>
-                    )}
-               </div>
+                         )}
+                    </div>
+               </ScrollArea>
 
                {/* Footer */}
                {activities.length > 0 && (
