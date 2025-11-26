@@ -104,10 +104,11 @@ export function TaskManagerSidebar() {
                     <div className="mb-8 flex items-center gap-3">
                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
                               <img
-                                   src={`${import.meta.env.BASE_URL}lovable-uploads/minhaLogo.png`}
+                                   src="/procoder-tasks/lovable-uploads/minhaLogo.png"
                                    alt="Logo"
                                    className="w-full h-full object-contain"
                               />
+
                          </div>
                          {!collapsed && (
                               <h1 className="text-xl font-bold text-sidebar-foreground">{systemName}</h1>
