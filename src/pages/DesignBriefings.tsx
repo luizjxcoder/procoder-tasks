@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react"
+import { Plus, Pencil, Trash2, Eye, LayoutGrid, List } from "lucide-react"
+import { TaskManagerSidebar } from "@/components/TaskManagerSidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -9,9 +12,6 @@ import { useAuth } from "@/hooks/useAuth"
 import { useToast } from "@/hooks/use-toast"
 import { BriefingForm } from "@/components/BriefingForm"
 import { BriefingDetailsModal } from "@/components/BriefingDetailsModal"
-import { TaskManagerSidebar } from "@/components/TaskManagerSidebar"
-import { useEffect, useState } from "react"
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react"
 
 interface Briefing {
      id: string
@@ -44,6 +44,7 @@ export default function DesignBriefings() {
      const [showDetailsDialog, setShowDetailsDialog] = useState(false)
      const [showDeleteDialog, setShowDeleteDialog] = useState(false)
      const [selectedBriefing, setSelectedBriefing] = useState<Briefing | null>(null)
+     const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
      const [formData, setFormData] = useState<Partial<Briefing>>({
           status: 'draft',
           conversion_goals: [],
@@ -223,10 +224,33 @@ export default function DesignBriefings() {
                                              Gerencie briefings detalhados e recursos de design
                                         </p>
                                    </div>
-                                   <Button onClick={() => setShowCreateDialog(true)}>
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Novo Briefing
-                                   </Button>
+                                   <div className="flex gap-4">
+                                        {/* View Mode Toggle */}
+                                        <div className="flex rounded-lg border border-border p-1">
+                                             <Button
+                                                  variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                                                  size="sm"
+                                                  onClick={() => setViewMode('cards')}
+                                                  className="h-8"
+                                             >
+                                                  <LayoutGrid className="w-4 h-4 mr-2" />
+                                                  Cards
+                                             </Button>
+                                             <Button
+                                                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                                                  size="sm"
+                                                  onClick={() => setViewMode('list')}
+                                                  className="h-8"
+                                             >
+                                                  <List className="w-4 h-4 mr-2" />
+                                                  Lista
+                                             </Button>
+                                        </div>
+                                        <Button onClick={() => setShowCreateDialog(true)}>
+                                             <Plus className="w-4 h-4 mr-2" />
+                                             Novo Briefing
+                                        </Button>
+                                   </div>
                               </div>
 
                               {loading ? (
@@ -246,7 +270,7 @@ export default function DesignBriefings() {
                                              Criar Primeiro Briefing
                                         </Button>
                                    </Card>
-                              ) : (
+                              ) : viewMode === 'cards' ? (
                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {briefings.map((briefing) => (
                                              <Card key={briefing.id} className="p-6 hover:shadow-lg transition-shadow">
@@ -304,6 +328,74 @@ export default function DesignBriefings() {
                                              </Card>
                                         ))}
                                    </div>
+                              ) : (
+                                   // List View
+                                   <Card className="overflow-hidden">
+                                        <div className="divide-y divide-border">
+                                             {briefings.map((briefing) => (
+                                                  <div
+                                                       key={briefing.id}
+                                                       className="p-4 hover:bg-muted/50 transition-colors"
+                                                  >
+                                                       <div className="flex items-center justify-between gap-4">
+                                                            <div className="flex items-start gap-3 flex-1 min-w-0">
+                                                                 <Badge className={getStatusColor(briefing.status)}>
+                                                                      {getStatusLabel(briefing.status)}
+                                                                 </Badge>
+
+                                                                 <div className="flex-1 min-w-0">
+                                                                      <h3 className="font-semibold text-base text-foreground mb-1 break-words">
+                                                                           {briefing.title}
+                                                                      </h3>
+
+                                                                      <p className="text-sm text-muted-foreground mb-2">
+                                                                           <span className="font-medium">{briefing.client_name}</span>
+                                                                           {' • '}
+                                                                           <span>{briefing.project_type}</span>
+                                                                      </p>
+
+                                                                      {briefing.target_audience && (
+                                                                           <p className="text-sm text-muted-foreground line-clamp-2 break-words">
+                                                                                {briefing.target_audience}
+                                                                           </p>
+                                                                      )}
+                                                                 </div>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-1 flex-shrink-0">
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => handleViewDetails(briefing)}
+                                                                      title="Visualizar detalhes"
+                                                                 >
+                                                                      <Eye className="w-4 h-4" />
+                                                                 </Button>
+
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => handleEdit(briefing)}
+                                                                      title="Editar"
+                                                                 >
+                                                                      <Pencil className="w-4 h-4" />
+                                                                 </Button>
+
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => handleDeleteClick(briefing)}
+                                                                      title="Excluir"
+                                                                      className="text-destructive hover:text-destructive"
+                                                                 >
+                                                                      <Trash2 className="w-4 h-4" />
+                                                                 </Button>
+                                                            </div>
+                                                       </div>
+                                                  </div>
+                                             ))}
+                                        </div>
+                                   </Card>
                               )}
                          </div>
 
