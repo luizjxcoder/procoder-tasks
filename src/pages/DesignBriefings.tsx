@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Plus, Pencil, Trash2, Eye, LayoutGrid, List } from "lucide-react"
 import { TaskManagerSidebar } from "@/components/TaskManagerSidebar"
-import { SidebarProvider } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
@@ -215,38 +215,41 @@ export default function DesignBriefings() {
           <SidebarProvider>
                <div className="flex min-h-screen w-full bg-background">
                     <TaskManagerSidebar />
-                    <main className="flex-1 p-6 overflow-auto">
-                         <div className="max-w-7xl mx-auto space-y-6">
-                              <div className="flex items-center justify-between">
-                                   <div>
-                                        <h1 className="text-3xl font-bold text-foreground">Briefings de Design</h1>
-                                        <p className="text-muted-foreground mt-1">
-                                             Gerencie briefings detalhados e recursos de design
-                                        </p>
+                    <main className="flex-1 p-4 sm:p-6 overflow-auto">
+                         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+                              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                   <div className="flex items-center gap-3">
+                                        <SidebarTrigger className="sm:hidden" />
+                                        <div>
+                                             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Briefings de Design</h1>
+                                             <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                                                  Gerencie briefings detalhados e recursos de design
+                                             </p>
+                                        </div>
                                    </div>
-                                   <div className="flex gap-4">
+                                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                                         {/* View Mode Toggle */}
                                         <div className="flex rounded-lg border border-border p-1">
                                              <Button
                                                   variant={viewMode === 'cards' ? 'default' : 'ghost'}
                                                   size="sm"
                                                   onClick={() => setViewMode('cards')}
-                                                  className="h-8"
+                                                  className="h-8 flex-1 sm:flex-none"
                                              >
-                                                  <LayoutGrid className="w-4 h-4 mr-2" />
-                                                  Cards
+                                                  <LayoutGrid className="w-4 h-4 sm:mr-2" />
+                                                  <span className="hidden sm:inline">Cards</span>
                                              </Button>
                                              <Button
                                                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                                                   size="sm"
                                                   onClick={() => setViewMode('list')}
-                                                  className="h-8"
+                                                  className="h-8 flex-1 sm:flex-none"
                                              >
-                                                  <List className="w-4 h-4 mr-2" />
-                                                  Lista
+                                                  <List className="w-4 h-4 sm:mr-2" />
+                                                  <span className="hidden sm:inline">Lista</span>
                                              </Button>
                                         </div>
-                                        <Button onClick={() => setShowCreateDialog(true)}>
+                                        <Button onClick={() => setShowCreateDialog(true)} className="w-full sm:w-auto">
                                              <Plus className="w-4 h-4 mr-2" />
                                              Novo Briefing
                                         </Button>
@@ -271,49 +274,52 @@ export default function DesignBriefings() {
                                         </Button>
                                    </Card>
                               ) : viewMode === 'cards' ? (
-                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                                         {briefings.map((briefing) => (
-                                             <Card key={briefing.id} className="p-6 hover:shadow-lg transition-shadow">
-                                                  <div className="flex items-start justify-between mb-4">
-                                                       <div className="flex-1">
-                                                            <h3 className="font-semibold text-lg text-foreground mb-1">
+                                             <Card key={briefing.id} className="p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                                                  <div className="flex flex-col sm:flex-row items-start justify-between mb-3 sm:mb-4 gap-2">
+                                                       <div className="flex-1 min-w-0 w-full">
+                                                            <h3 className="font-semibold text-base sm:text-lg text-foreground mb-1 break-words">
                                                                  {briefing.title}
                                                             </h3>
                                                             <p className="text-sm text-muted-foreground">
                                                                  {briefing.client_name}
                                                             </p>
                                                        </div>
-                                                       <Badge className={getStatusColor(briefing.status)}>
+                                                       <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap`}>
                                                             {getStatusLabel(briefing.status)}
                                                        </Badge>
                                                   </div>
 
-                                                  <div className="space-y-2 mb-4">
+                                                  <div className="space-y-2 mb-3 sm:mb-4">
                                                        <p className="text-sm">
                                                             <span className="text-muted-foreground">Tipo: </span>
                                                             <span className="text-foreground">{briefing.project_type}</span>
                                                        </p>
                                                        {briefing.target_audience && (
-                                                            <p className="text-sm text-muted-foreground line-clamp-2">
+                                                            <p className="text-sm text-muted-foreground line-clamp-2 break-words">
                                                                  {briefing.target_audience}
                                                             </p>
                                                        )}
                                                   </div>
 
-                                                  <div className="flex gap-2">
+                                                  <div className="flex gap-2 justify-center sm:justify-start">
                                                        <Button
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => handleViewDetails(briefing)}
-                                                            className="flex-1"
+                                                            className="flex-1 sm:flex-none"
+                                                            title="Visualizar detalhes"
                                                        >
-                                                            <Eye className="w-4 h-4 mr-1" />
-                                                            Ver
+                                                            <Eye className="w-4 h-4 sm:mr-1" />
+                                                            <span className="hidden sm:inline">Ver</span>
                                                        </Button>
                                                        <Button
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => handleEdit(briefing)}
+                                                            className="flex-1 sm:flex-none"
+                                                            title="Editar briefing"
                                                        >
                                                             <Pencil className="w-4 h-4" />
                                                        </Button>
@@ -321,6 +327,8 @@ export default function DesignBriefings() {
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => handleDeleteClick(briefing)}
+                                                            className="flex-1 sm:flex-none"
+                                                            title="Excluir briefing"
                                                        >
                                                             <Trash2 className="w-4 h-4" />
                                                        </Button>
@@ -335,39 +343,40 @@ export default function DesignBriefings() {
                                              {briefings.map((briefing) => (
                                                   <div
                                                        key={briefing.id}
-                                                       className="p-4 hover:bg-muted/50 transition-colors"
+                                                       className="p-2.5 sm:p-3 hover:bg-muted/50 transition-colors"
                                                   >
-                                                       <div className="flex items-center justify-between gap-4">
-                                                            <div className="flex items-start gap-3 flex-1 min-w-0">
-                                                                 <Badge className={getStatusColor(briefing.status)}>
+                                                       <div className="flex items-start justify-between gap-3">
+                                                            <div className="flex items-start gap-2 flex-1 min-w-0">
+                                                                 <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap self-start text-xs`}>
                                                                       {getStatusLabel(briefing.status)}
                                                                  </Badge>
 
                                                                  <div className="flex-1 min-w-0">
-                                                                      <h3 className="font-semibold text-base text-foreground mb-1 break-words">
+                                                                      <h3 className="font-semibold text-sm text-foreground mb-0.5 break-words">
                                                                            {briefing.title}
                                                                       </h3>
 
-                                                                      <p className="text-sm text-muted-foreground mb-2">
+                                                                      <p className="text-xs text-muted-foreground mb-1">
                                                                            <span className="font-medium">{briefing.client_name}</span>
                                                                            {' • '}
                                                                            <span>{briefing.project_type}</span>
                                                                       </p>
 
                                                                       {briefing.target_audience && (
-                                                                           <p className="text-sm text-muted-foreground line-clamp-2 break-words">
+                                                                           <p className="text-xs text-muted-foreground line-clamp-1 break-words">
                                                                                 {briefing.target_audience}
                                                                            </p>
                                                                       )}
                                                                  </div>
                                                             </div>
 
-                                                            <div className="flex items-center gap-1 flex-shrink-0">
+                                                            <div className="flex items-center gap-0.5 flex-shrink-0">
                                                                  <Button
                                                                       variant="ghost"
                                                                       size="sm"
                                                                       onClick={() => handleViewDetails(briefing)}
                                                                       title="Visualizar detalhes"
+                                                                      className="h-8 w-8 p-0"
                                                                  >
                                                                       <Eye className="w-4 h-4" />
                                                                  </Button>
@@ -377,6 +386,7 @@ export default function DesignBriefings() {
                                                                       size="sm"
                                                                       onClick={() => handleEdit(briefing)}
                                                                       title="Editar"
+                                                                      className="h-8 w-8 p-0"
                                                                  >
                                                                       <Pencil className="w-4 h-4" />
                                                                  </Button>
@@ -386,7 +396,7 @@ export default function DesignBriefings() {
                                                                       size="sm"
                                                                       onClick={() => handleDeleteClick(briefing)}
                                                                       title="Excluir"
-                                                                      className="text-destructive hover:text-destructive"
+                                                                      className="text-destructive hover:text-destructive h-8 w-8 p-0"
                                                                  >
                                                                       <Trash2 className="w-4 h-4" />
                                                                  </Button>
@@ -401,9 +411,9 @@ export default function DesignBriefings() {
 
                          {/* Create Dialog */}
                          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-                              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                              <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
                                    <DialogHeader>
-                                        <DialogTitle>Novo Briefing de Design</DialogTitle>
+                                        <DialogTitle className="text-lg sm:text-xl">Novo Briefing de Design</DialogTitle>
                                    </DialogHeader>
                                    <BriefingForm
                                         formData={formData}
@@ -419,9 +429,9 @@ export default function DesignBriefings() {
 
                          {/* Edit Dialog */}
                          <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-                              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                              <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
                                    <DialogHeader>
-                                        <DialogTitle>Editar Briefing</DialogTitle>
+                                        <DialogTitle className="text-lg sm:text-xl">Editar Briefing</DialogTitle>
                                    </DialogHeader>
                                    <BriefingForm
                                         formData={formData}

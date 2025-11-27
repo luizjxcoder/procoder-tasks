@@ -75,36 +75,36 @@ export function BriefingDetailsModal({
 
      return (
           <Dialog open={open} onOpenChange={onOpenChange}>
-               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+               <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                         <div className="flex items-start justify-between">
-                              <div>
-                                   <DialogTitle className="text-2xl">{briefing.title}</DialogTitle>
-                                   <p className="text-muted-foreground mt-1">{briefing.client_name}</p>
+                         <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0">
+                              <div className="flex-1 min-w-0 w-full">
+                                   <DialogTitle className="text-xl sm:text-2xl break-words">{briefing.title}</DialogTitle>
+                                   <p className="text-muted-foreground mt-1 text-sm sm:text-base">{briefing.client_name}</p>
                               </div>
-                              <Badge className={getStatusColor(briefing.status)}>
+                              <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap self-start`}>
                                    {getStatusLabel(briefing.status)}
                               </Badge>
                          </div>
                     </DialogHeader>
 
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                          {/* Logo */}
                          {briefing.logo_url && (
-                              <Card className="p-6">
-                                   <h3 className="font-semibold mb-3">Logo</h3>
+                              <Card className="p-4 sm:p-6">
+                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Logo</h3>
                                    <img
                                         src={briefing.logo_url}
                                         alt="Logo"
-                                        className="w-full max-w-xs h-32 object-contain bg-muted rounded-lg p-4"
+                                        className="w-full max-w-xs h-24 sm:h-32 object-contain bg-muted rounded-lg p-3 sm:p-4"
                                    />
                               </Card>
                          )}
 
                          {/* Basic Info */}
-                         <Card className="p-6">
-                              <h3 className="font-semibold mb-3">Informações Básicas</h3>
-                              <div className="grid grid-cols-2 gap-4">
+                         <Card className="p-4 sm:p-6">
+                              <h3 className="font-semibold mb-3 text-sm sm:text-base">Informações Básicas</h3>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                    <div>
                                         <p className="text-sm text-muted-foreground">Tipo de Projeto</p>
                                         <p className="font-medium">{briefing.project_type}</p>
@@ -129,8 +129,8 @@ export function BriefingDetailsModal({
 
                          {/* Target & Inspiration */}
                          {(briefing.target_audience || briefing.design_inspiration) && (
-                              <Card className="p-6">
-                                   <h3 className="font-semibold mb-3">Público e Inspiração</h3>
+                              <Card className="p-4 sm:p-6">
+                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Público e Inspiração</h3>
                                    {briefing.target_audience && (
                                         <div className="mb-4">
                                              <p className="text-sm text-muted-foreground mb-2">Público-Alvo</p>
@@ -148,8 +148,8 @@ export function BriefingDetailsModal({
 
                          {/* Conversion Goals */}
                          {briefing.conversion_goals && briefing.conversion_goals.length > 0 && (
-                              <Card className="p-6">
-                                   <h3 className="font-semibold mb-3">Metas de Conversão</h3>
+                              <Card className="p-4 sm:p-6">
+                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Metas de Conversão</h3>
                                    <div className="space-y-2">
                                         {briefing.conversion_goals.map((goal: any, index: number) => (
                                              <div key={index} className="p-3 bg-muted rounded-lg">
@@ -164,8 +164,8 @@ export function BriefingDetailsModal({
                          )}
 
                          {/* Brand Guidelines */}
-                         <Card className="p-6">
-                              <h3 className="font-semibold mb-3">Guia de Marca</h3>
+                         <Card className="p-4 sm:p-6">
+                              <h3 className="font-semibold mb-3 text-sm sm:text-base">Guia de Marca</h3>
 
                               {/* Color Palette */}
                               {briefing.color_palette && Object.keys(briefing.color_palette).length > 0 && (
@@ -175,14 +175,16 @@ export function BriefingDetailsModal({
                                              {Object.entries(briefing.color_palette).map(([name, hex]) => (
                                                   <div
                                                        key={name}
-                                                       className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg"
+                                                       className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-muted rounded-lg min-w-0"
                                                   >
                                                        <div
-                                                            className="w-6 h-6 rounded border border-border"
+                                                            className="w-6 h-6 rounded border border-border flex-shrink-0"
                                                             style={{ backgroundColor: hex as string }}
                                                        />
-                                                       <span className="text-sm font-medium">{name}</span>
-                                                       <span className="text-xs text-muted-foreground">{String(hex)}</span>
+                                                       <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1 min-w-0 w-full">
+                                                            <span className="text-xs sm:text-sm font-medium break-words">{name}</span>
+                                                            <span className="text-xs text-muted-foreground break-all">{String(hex)}</span>
+                                                       </div>
                                                   </div>
                                              ))}
                                         </div>
@@ -193,7 +195,7 @@ export function BriefingDetailsModal({
                               {(briefing.typography_primary || briefing.typography_secondary) && (
                                    <div className="mb-4">
                                         <p className="text-sm text-muted-foreground mb-2">Tipografia</p>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                              {briefing.typography_primary && (
                                                   <div>
                                                        <p className="text-xs text-muted-foreground">Primária</p>
@@ -221,32 +223,33 @@ export function BriefingDetailsModal({
 
                          {/* Documents Section */}
                          {briefing.brand_assets && Array.isArray(briefing.brand_assets) && briefing.brand_assets.length > 0 && (
-                              <Card className="p-6">
-                                   <h3 className="font-semibold mb-3 flex items-center gap-2">
-                                        <FileText className="w-5 h-5" />
+                              <Card className="p-4 sm:p-6">
+                                   <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
+                                        <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                                         Documentos e Arquivos
                                    </h3>
                                    <div className="space-y-2">
                                         {briefing.brand_assets.map((doc: any) => (
                                              <div
                                                   key={doc.id}
-                                                  className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                                                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
                                              >
-                                                  <div className="flex items-center gap-3">
-                                                       <FileText className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                                                       <div>
-                                                            <p className="text-sm font-medium">{doc.name}</p>
+                                                  <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-1 min-w-0 w-full">
+                                                       <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground flex-shrink-0 mt-0.5 sm:mt-0" />
+                                                       <div className="min-w-0 flex-1">
+                                                            <p className="text-xs sm:text-sm font-medium break-words">{doc.name}</p>
                                                             <p className="text-xs text-muted-foreground">
                                                                  {doc.size ? `${(doc.size / 1024 / 1024).toFixed(2)} MB` : 'Tamanho desconhecido'}
                                                             </p>
                                                        </div>
                                                   </div>
-                                                  <div className="flex gap-2">
+                                                  <div className="flex gap-2 w-full sm:w-auto">
                                                        <Button
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() => handleDownloadDocument(doc)}
                                                             title="Baixar documento"
+                                                            className="flex-1 sm:flex-none"
                                                        >
                                                             <Download className="w-4 h-4 mr-2" />
                                                             Baixar
@@ -259,9 +262,9 @@ export function BriefingDetailsModal({
                          )}
 
                          {/* Metadata */}
-                         <Card className="p-6">
-                              <h3 className="font-semibold mb-3">Informações do Sistema</h3>
-                              <div className="grid grid-cols-2 gap-4 text-sm">
+                         <Card className="p-4 sm:p-6">
+                              <h3 className="font-semibold mb-3 text-sm sm:text-base">Informações do Sistema</h3>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                                    <div>
                                         <p className="text-muted-foreground">Criado em</p>
                                         <p className="font-medium">
