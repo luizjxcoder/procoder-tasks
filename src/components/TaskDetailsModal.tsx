@@ -87,14 +87,21 @@ export function TaskDetailsModal({ task, projects, open, onOpenChange }: TaskDet
 
                     <div className="space-y-4 sm:space-y-6">
                          {/* Header */}
-                         <div className="space-y-1.5 sm:space-y-2">
+                         <div className="space-y-2">
                               <h1 className="text-xl sm:text-2xl font-bold text-card-foreground break-words">{task.title}</h1>
-                              {task.description && (
-                                   <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                                        {task.description}
-                                   </p>
-                              )}
                          </div>
+
+                         {/* Description */}
+                         {task.description && (
+                              <div className="space-y-2">
+                                   <h2 className="text-sm font-semibold text-card-foreground">Descrição</h2>
+                                   <div className="p-3 rounded-lg bg-muted/50">
+                                        <p className="text-sm text-white whitespace-pre-wrap">
+                                             {task.description}
+                                        </p>
+                                   </div>
+                              </div>
+                         )}
 
                          {/* Status and Priority */}
                          <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -126,7 +133,7 @@ export function TaskDetailsModal({ task, projects, open, onOpenChange }: TaskDet
                               </div>
 
                               <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg bg-muted/50">
-                                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-foreground flex-shrink-0" />
                                    <div className="min-w-0">
                                         <p className="text-xs sm:text-sm text-muted-foreground">Data de Vencimento</p>
                                         <p className="text-sm sm:text-base font-medium">
@@ -179,8 +186,8 @@ export function TaskDetailsModal({ task, projects, open, onOpenChange }: TaskDet
                                                        />
                                                        <span
                                                             className={`flex-1 text-sm ${subtask.status === 'completed'
-                                                                      ? 'line-through text-muted-foreground'
-                                                                      : 'text-foreground'
+                                                                 ? 'line-through text-muted-foreground'
+                                                                 : 'text-foreground'
                                                                  }`}
                                                        >
                                                             {subtask.title}
@@ -188,8 +195,8 @@ export function TaskDetailsModal({ task, projects, open, onOpenChange }: TaskDet
                                                        <Badge
                                                             variant="secondary"
                                                             className={`text-xs ${subtask.status === 'completed'
-                                                                      ? 'bg-success text-white'
-                                                                      : 'bg-muted text-muted-foreground'
+                                                                 ? 'bg-success text-white'
+                                                                 : 'bg-muted text-muted-foreground'
                                                                  }`}
                                                        >
                                                             {subtask.status === 'completed' ? 'Concluída' : 'Pendente'}
