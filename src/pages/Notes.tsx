@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { TaskManagerSidebar } from "@/components/TaskManagerSidebar"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { useAuth } from "@/hooks/useAuth"
@@ -36,6 +37,8 @@ export default function Notes() {
      const [viewingNote, setViewingNote] = useState<Note | null>(null)
      const [editingNote, setEditingNote] = useState<Note | null>(null)
      const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
+     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+     const [noteToDelete, setNoteToDelete] = useState<string | null>(null)
 
      // Form states
      const [title, setTitle] = useState("")
@@ -132,12 +135,14 @@ export default function Notes() {
           }
      }
 
-     const handleDeleteNote = async (noteId: string) => {
+     const handleDeleteNote = async () => {
+          if (!noteToDelete) return
+
           try {
                const { error } = await supabase
                     .from('notes')
                     .delete()
-                    .eq('id', noteId)
+                    .eq('id', noteToDelete)
                     .eq('user_id', user?.id)
 
                if (error) throw error
@@ -154,7 +159,15 @@ export default function Notes() {
                     description: "Tente novamente",
                     variant: "destructive"
                })
+          } finally {
+               setDeleteDialogOpen(false)
+               setNoteToDelete(null)
           }
+     }
+
+     const openDeleteDialog = (noteId: string) => {
+          setNoteToDelete(noteId)
+          setDeleteDialogOpen(true)
      }
 
      const toggleFavorite = async (note: Note) => {
@@ -429,7 +442,7 @@ export default function Notes() {
                                                             <Button
                                                                  variant="ghost"
                                                                  size="sm"
-                                                                 onClick={() => handleDeleteNote(note.id)}
+                                                                 onClick={() => openDeleteDialog(note.id)}
                                                                  title="Excluir"
                                                                  className="h-6 w-6 sm:h-7 sm:w-7 p-0"
                                                             >
@@ -558,7 +571,7 @@ export default function Notes() {
                                                             <Button
                                                                  variant="ghost"
                                                                  size="sm"
-                                                                 onClick={() => handleDeleteNote(note.id)}
+                                                                 onClick={() => openDeleteDialog(note.id)}
                                                                  title="Excluir"
                                                                  className="text-destructive hover:text-destructive"
                                                             >
@@ -578,6 +591,24 @@ export default function Notes() {
                               open={isDetailsOpen}
                               onOpenChange={setIsDetailsOpen}
                          />
+
+                         {/* Delete Confirmation Dialog */}
+                         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                              <AlertDialogContent>
+                                   <AlertDialogHeader>
+                                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                             Tem certeza que deseja excluir esta nota? Esta ação não pode ser desfeita.
+                                        </AlertDialogDescription>
+                                   </AlertDialogHeader>
+                                   <AlertDialogFooter>
+                                        <AlertDialogCancel onClick={() => setNoteToDelete(null)}>Cancelar</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleDeleteNote} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                             Excluir
+                                        </AlertDialogAction>
+                                   </AlertDialogFooter>
+                              </AlertDialogContent>
+                         </AlertDialog>
                     </div>
                </SidebarInset>
           </SidebarProvider>
