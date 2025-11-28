@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
-import { Calendar, Clock, Flag, Eye, Edit2, Trash2 } from "lucide-react"
+import { Calendar, Clock, Flag, Eye, Edit2, Trash2, CheckSquare } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface Task {
@@ -14,6 +14,7 @@ interface Task {
      dueDate: string
      status: "todo" | "in-progress" | "completed"
      estimatedTime: string
+     subtasks?: Task[]
 }
 
 interface TaskListProps {
@@ -78,7 +79,7 @@ export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit, showEd
                          return (
                               <div
                                    key={task.id}
-                                   className={`flex items-center gap-2 sm:gap-3 px-2 sm:px-3 rounded-lg border border-border transition-all duration-300 hover:bg-secondary/20 cursor-pointer h-[60px] overflow-hidden ${isCompleted ? "opacity-60" : ""
+                                   className={`flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-lg border border-border transition-all duration-300 hover:bg-secondary/20 cursor-pointer min-h-[75px] overflow-hidden ${isCompleted ? "opacity-60" : ""
                                         }`}
                                    onClick={() => navigate('/tasks')}
                               >
@@ -94,18 +95,23 @@ export function TaskList({ tasks, onTaskUpdate, onTaskDelete, onTaskEdit, showEd
                                              {task.title}
                                         </h3>
 
-                                        <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden mb-1">
                                              <span className="font-medium truncate max-w-[100px]">{task.project}</span>
                                              <div className="flex items-center gap-2 flex-shrink-0">
                                                   <div className="flex items-center gap-1">
                                                        <Calendar className="w-3 h-3" />
-                                                       <span>{task.dueDate}</span>
+                                                       <span className="whitespace-nowrap">{task.dueDate}</span>
                                                   </div>
-                                                  <div className="flex items-center gap-1">
+                                                  <div className="flex items-center gap-1 min-w-[60px]">
                                                        <Clock className="w-3 h-3" />
-                                                       <span>{task.estimatedTime}</span>
+                                                       <span className="whitespace-nowrap">{task.estimatedTime}</span>
                                                   </div>
                                              </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                             <CheckSquare className="w-3 h-3 text-primary" />
+                                             <span>Subtarefas: {task.subtasks?.length || 0}</span>
                                         </div>
                                    </div>
 

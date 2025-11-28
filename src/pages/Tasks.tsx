@@ -701,7 +701,7 @@ export default function Tasks() {
                                                        key={task.id}
                                                        className={`hover:shadow-md transition-colors border ${getDeadlineBorderColor(task.due_date)}`}
                                                   >
-                                                       <CardContent className="p-2 sm:p-3 h-[60px] overflow-hidden">
+                                                       <CardContent className="p-2 sm:p-3 min-h-[75px] overflow-hidden">
                                                             <div className="flex items-center justify-between gap-2 h-full">
                                                                  <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
                                                                       <Checkbox
@@ -718,7 +718,7 @@ export default function Tasks() {
                                                                                 {task.title}
                                                                            </h3>
 
-                                                                           <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                                                                           <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden mb-1">
                                                                                 <span className="font-medium truncate max-w-[100px]">
                                                                                      {getProjectName(task.project_id)}
                                                                                 </span>
@@ -727,17 +727,22 @@ export default function Tasks() {
                                                                                      {task.due_date && (
                                                                                           <div className="flex items-center gap-1">
                                                                                                <Calendar className="w-3 h-3" />
-                                                                                               <span>{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
+                                                                                               <span className="whitespace-nowrap">{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
                                                                                           </div>
                                                                                      )}
 
                                                                                      {task.estimated_time && (
-                                                                                          <div className="flex items-center gap-1">
+                                                                                          <div className="flex items-center gap-1 min-w-[60px]">
                                                                                                <Clock className="w-3 h-3" />
-                                                                                               <span>{task.estimated_time}</span>
+                                                                                               <span className="whitespace-nowrap">{task.estimated_time}</span>
                                                                                           </div>
                                                                                      )}
                                                                                 </div>
+                                                                           </div>
+
+                                                                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                                                <CheckSquare className="w-3 h-3 text-primary" />
+                                                                                <span>Subtarefas: {task.subtasks?.length || 0}</span>
                                                                            </div>
                                                                       </div>
 
@@ -816,7 +821,7 @@ export default function Tasks() {
                                                        {tasks.map((task) => (
                                                             <div
                                                                  key={task.id}
-                                                                 className={`px-2 sm:px-3 hover:bg-muted/50 transition-colors border-l-4 h-[60px] overflow-hidden ${getDeadlineLeftBorderColor(task.due_date)}`}
+                                                                 className={`px-2 sm:px-3 py-2 hover:bg-muted/50 transition-colors border-l-4 min-h-[75px] overflow-hidden ${getDeadlineLeftBorderColor(task.due_date)}`}
                                                             >
                                                                  <div className="flex items-center justify-between gap-2 h-full">
                                                                       <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
@@ -834,7 +839,7 @@ export default function Tasks() {
                                                                                      {task.title}
                                                                                 </h3>
 
-                                                                                <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                                                                                <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden mb-1">
                                                                                      <span className="font-medium truncate max-w-[100px]">
                                                                                           {getProjectName(task.project_id)}
                                                                                      </span>
@@ -843,17 +848,22 @@ export default function Tasks() {
                                                                                           {task.due_date && (
                                                                                                <div className="flex items-center gap-1">
                                                                                                     <Calendar className="w-3 h-3" />
-                                                                                                    <span>{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
+                                                                                                    <span className="whitespace-nowrap">{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
                                                                                                </div>
                                                                                           )}
 
                                                                                           {task.estimated_time && (
-                                                                                               <div className="flex items-center gap-1">
+                                                                                               <div className="flex items-center gap-1 min-w-[60px]">
                                                                                                     <Clock className="w-3 h-3" />
-                                                                                                    <span>{task.estimated_time}</span>
+                                                                                                    <span className="whitespace-nowrap">{task.estimated_time}</span>
                                                                                                </div>
                                                                                           )}
                                                                                      </div>
+                                                                                </div>
+
+                                                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                                                     <CheckSquare className="w-3 h-3 text-primary" />
+                                                                                     <span>Subtarefas: {task.subtasks?.length || 0}</span>
                                                                                 </div>
                                                                            </div>
 
