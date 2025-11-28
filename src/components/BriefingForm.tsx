@@ -24,7 +24,7 @@ interface BriefingFormData {
      typography_primary?: string
      typography_secondary?: string
      brand_voice?: string
-     logo_url?: string
+     logo_url?: string | string[]
      brand_assets?: any[]
      status?: string
 }
@@ -57,6 +57,17 @@ export function BriefingForm({
      const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
           const file = e.target.files?.[0]
           if (!file || !user) return
+
+          const currentLogos = Array.isArray(formData.logo_url) ? formData.logo_url : formData.logo_url ? [formData.logo_url] : []
+
+          if (currentLogos.length >= 3) {
+               toast({
+                    title: "Limite atingido",
+                    description: "Você pode fazer upload de no máximo 3 imagens",
+                    variant: "destructive"
+               })
+               return
+          }
 
           if (!file.type.startsWith('image/')) {
                toast({
@@ -93,11 +104,11 @@ export function BriefingForm({
                     .from('design-assets')
                     .getPublicUrl(fileName)
 
-               handleInputChange('logo_url', publicUrl)
+               handleInputChange('logo_url', [...currentLogos, publicUrl])
 
                toast({
                     title: "Logo enviado",
-                    description: "O logo foi enviado com sucesso"
+                    description: `Logo ${currentLogos.length + 1}/3 enviado com sucesso`
                })
           } catch (error) {
                console.error('Error uploading logo:', error)
@@ -108,21 +119,26 @@ export function BriefingForm({
                })
           } finally {
                setUploading(false)
+               e.target.value = ''
           }
      }
 
-     const removeLogo = async () => {
+     const removeLogo = async (urlToRemove: string) => {
           if (!formData.logo_url) return
 
           try {
-               const fileName = formData.logo_url.split('/').pop()
-               if (fileName) {
+               const fileName = urlToRemove.split('/').pop()
+               if (fileName && user?.id) {
                     await supabase.storage
                          .from('design-assets')
-                         .remove([`${user?.id}/${fileName}`])
+                         .remove([`${user.id}/${fileName}`])
                }
 
-               handleInputChange('logo_url', null)
+               const currentLogos = Array.isArray(formData.logo_url) ? formData.logo_url : [formData.logo_url]
+               const updatedLogos = currentLogos.filter(url => url !== urlToRemove)
+
+               handleInputChange('logo_url', updatedLogos.length > 0 ? updatedLogos : null)
+
                toast({
                     title: "Logo removido",
                     description: "O logo foi removido com sucesso"
@@ -424,43 +440,65 @@ export function BriefingForm({
                     <div className="space-y-4">
                          {/* Logo Upload */}
                          <div className="space-y-2">
-                              <Label>Logo da Marca</Label>
-                              {formData.logo_url ? (
-                                   <div className="relative w-full max-w-xs">
-                                        <img
-                                             src={formData.logo_url}
-                                             alt="Logo"
-                                             className="w-full h-32 object-contain bg-muted rounded-lg p-4"
-                                        />
-                                        <Button
-                                             type="button"
-                                             variant="destructive"
-                                             size="sm"
-                                             className="absolute top-2 right-2"
-                                             onClick={removeLogo}
-                                        >
-                                             <X className="w-4 h-4" />
-                                        </Button>
-                                   </div>
-                              ) : (
-                                   <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                                        <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                                        <Label
-                                             htmlFor="logo-upload"
-                                             className="cursor-pointer text-sm text-muted-foreground hover:text-foreground"
-                                        >
-                                             {uploading ? 'Enviando...' : 'Clique para fazer upload do logo'}
-                                        </Label>
-                                        <Input
-                                             id="logo-upload"
-                                             type="file"
-                                             accept="image/*"
-                                             className="hidden"
-                                             onChange={handleLogoUpload}
-                                             disabled={uploading}
-                                        />
-                                   </div>
-                              )}
+                              <Label>Logo da Marca (até 3 imagens, máx 5MB cada)</Label>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                   {(() => {
+                                        const currentLogos = Array.isArray(formData.logo_url)
+                                             ? formData.logo_url
+                                             : formData.logo_url
+                                                  ? [formData.logo_url]
+                                                  : []
+
+                                        return Array.from({ length: 3 }).map((_, index) => {
+                                             const logoUrl = currentLogos[index]
+
+                                             return (
+                                                  <div key={index} className="space-y-2">
+                                                       {logoUrl ? (
+                                                            <div className="relative">
+                                                                 <img
+                                                                      src={logoUrl}
+                                                                      alt={`Logo ${index + 1}`}
+                                                                      className="w-full h-32 object-contain bg-muted rounded-lg p-4"
+                                                                 />
+                                                                 <Button
+                                                                      type="button"
+                                                                      variant="destructive"
+                                                                      size="sm"
+                                                                      className="absolute top-2 right-2"
+                                                                      onClick={() => removeLogo(logoUrl)}
+                                                                 >
+                                                                      <X className="w-4 h-4" />
+                                                                 </Button>
+                                                            </div>
+                                                       ) : currentLogos.length === index ? (
+                                                            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center h-32 flex flex-col items-center justify-center">
+                                                                 <Upload className="w-6 h-6 mb-2 text-muted-foreground" />
+                                                                 <Label
+                                                                      htmlFor={`logo-upload-${index}`}
+                                                                      className="cursor-pointer text-xs text-muted-foreground hover:text-foreground"
+                                                                 >
+                                                                      {uploading ? 'Enviando...' : `Logo ${index + 1}`}
+                                                                 </Label>
+                                                                 <Input
+                                                                      id={`logo-upload-${index}`}
+                                                                      type="file"
+                                                                      accept="image/*"
+                                                                      className="hidden"
+                                                                      onChange={handleLogoUpload}
+                                                                      disabled={uploading}
+                                                                 />
+                                                            </div>
+                                                       ) : (
+                                                            <div className="border-2 border-dashed border-muted rounded-lg p-6 text-center h-32 flex items-center justify-center opacity-50">
+                                                                 <span className="text-xs text-muted-foreground">Logo {index + 1}</span>
+                                                            </div>
+                                                       )}
+                                                  </div>
+                                             )
+                                        })
+                                   })()}
+                              </div>
                          </div>
 
                          {/* Color Palette */}

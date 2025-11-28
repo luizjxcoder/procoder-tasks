@@ -27,7 +27,7 @@ interface Briefing {
      typography_primary: string | null
      typography_secondary: string | null
      brand_voice: string | null
-     logo_url: string | null
+     logo_url: string | string[] | null
      brand_assets: any[]
      status: string
      created_at: string

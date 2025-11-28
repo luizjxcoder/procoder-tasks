@@ -169,6 +169,8 @@ const Index = () => {
                     ],
                     tags: ["Projeto"],
                     status: project.status as "active" | "completed" | "on-hold",
+                    imageUrl: project.image_url || undefined,
+                    project
                })) || []
 
                setRealProjects(formattedProjects)

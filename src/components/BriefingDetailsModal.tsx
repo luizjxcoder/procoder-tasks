@@ -1,9 +1,10 @@
+import React, { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { FileText, Download } from "lucide-react"
+import { FileText, Download, ChevronLeft, ChevronRight, X } from "lucide-react"
 
 interface Briefing {
      id: string
@@ -19,7 +20,7 @@ interface Briefing {
      typography_primary: string | null
      typography_secondary: string | null
      brand_voice: string | null
-     logo_url: string | null
+     logo_url: string | string[] | null
      brand_assets: any[]
      status: string
      created_at: string
@@ -36,6 +37,39 @@ export function BriefingDetailsModal({
      open,
      onOpenChange
 }: BriefingDetailsModalProps) {
+     const [lightboxOpen, setLightboxOpen] = useState(false)
+     const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+     // Ensure logoUrls is always an array
+     const logoUrls = React.useMemo(() => {
+          if (!briefing.logo_url) return []
+          if (Array.isArray(briefing.logo_url)) return briefing.logo_url
+          if (typeof briefing.logo_url === 'string') {
+               // Check if it's a JSON string array
+               try {
+                    const parsed = JSON.parse(briefing.logo_url)
+                    if (Array.isArray(parsed)) return parsed
+               } catch {
+                    // Not a JSON string, treat as single URL
+               }
+               return [briefing.logo_url]
+          }
+          return []
+     }, [briefing.logo_url])
+
+     const openLightbox = (index: number) => {
+          setCurrentImageIndex(index)
+          setLightboxOpen(true)
+     }
+
+     const nextImage = () => {
+          setCurrentImageIndex((prev) => (prev + 1) % logoUrls.length)
+     }
+
+     const prevImage = () => {
+          setCurrentImageIndex((prev) => (prev - 1 + logoUrls.length) % logoUrls.length)
+     }
+
      const getStatusColor = (status: string) => {
           const colors: Record<string, string> = {
                draft: 'bg-muted text-muted-foreground',
@@ -90,14 +124,24 @@ export function BriefingDetailsModal({
 
                     <div className="space-y-4 sm:space-y-6">
                          {/* Logo */}
-                         {briefing.logo_url && (
+                         {briefing.logo_url && logoUrls.length > 0 && (
                               <Card className="p-4 sm:p-6">
-                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Logo</h3>
-                                   <img
-                                        src={briefing.logo_url}
-                                        alt="Logo"
-                                        className="w-full max-w-xs h-24 sm:h-32 object-contain bg-muted rounded-lg p-3 sm:p-4"
-                                   />
+                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Logo{logoUrls.length > 1 ? 's' : ''}</h3>
+                                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                                        {logoUrls.map((url, index) => (
+                                             <div
+                                                  key={index}
+                                                  onClick={() => openLightbox(index)}
+                                                  className="aspect-square cursor-pointer hover:opacity-80 transition-opacity rounded-lg overflow-hidden border border-border bg-muted"
+                                             >
+                                                  <img
+                                                       src={url}
+                                                       alt={`Logo ${index + 1}`}
+                                                       className="w-full h-full object-contain p-4"
+                                                  />
+                                             </div>
+                                        ))}
+                                   </div>
                               </Card>
                          )}
 
@@ -275,6 +319,56 @@ export function BriefingDetailsModal({
                          </Card>
                     </div>
                </DialogContent>
+
+               {/* Lightbox Dialog */}
+               <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+                    <DialogContent className="max-w-screen max-h-screen w-screen h-screen p-0 bg-black/95 border-0 [&>button]:hidden">
+                         <div className="relative w-full h-full flex items-center justify-center">
+                              <Button
+                                   variant="ghost"
+                                   size="icon"
+                                   onClick={() => setLightboxOpen(false)}
+                                   className="absolute top-4 right-4 z-50 text-white hover:bg-orange-500/20 hover:text-orange-500 transition-colors"
+                              >
+                                   <X className="w-6 h-6" />
+                              </Button>
+
+                              {logoUrls.length > 1 && (
+                                   <>
+                                        <Button
+                                             variant="ghost"
+                                             size="icon"
+                                             onClick={prevImage}
+                                             className="absolute left-4 z-50 text-white hover:bg-white/20"
+                                        >
+                                             <ChevronLeft className="w-8 h-8" />
+                                        </Button>
+
+                                        <Button
+                                             variant="ghost"
+                                             size="icon"
+                                             onClick={nextImage}
+                                             className="absolute right-4 z-50 text-white hover:bg-white/20"
+                                        >
+                                             <ChevronRight className="w-8 h-8" />
+                                        </Button>
+                                   </>
+                              )}
+
+                              <img
+                                   src={logoUrls[currentImageIndex]}
+                                   alt={`Logo ${currentImageIndex + 1}`}
+                                   className="max-w-[90%] max-h-[90%] object-contain"
+                              />
+
+                              {logoUrls.length > 1 && (
+                                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-4 py-2 rounded-full">
+                                        {currentImageIndex + 1} / {logoUrls.length}
+                                   </div>
+                              )}
+                         </div>
+                    </DialogContent>
+               </Dialog>
           </Dialog>
      )
 }

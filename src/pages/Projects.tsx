@@ -295,16 +295,25 @@ const Projects = () => {
           <Card className="border border-border">
                <CardContent className="p-3">
                     <div className="flex justify-between items-start mb-2">
-                         <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-sm text-card-foreground truncate">
-                                   {project.title}
-                              </h3>
-                              {project.company && (
-                                   <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                                        <Users className="w-3 h-3" />
-                                        <span className="truncate">{project.company}</span>
-                                   </div>
+                         <div className="flex items-start gap-2 flex-1 min-w-0">
+                              {project.image_url && (
+                                   <img
+                                        src={project.image_url}
+                                        alt={project.title}
+                                        className="w-[35px] h-[35px] rounded-full object-cover border border-border flex-shrink-0"
+                                   />
                               )}
+                              <div className="flex-1 min-w-0">
+                                   <h3 className="font-semibold text-sm text-card-foreground truncate">
+                                        {project.title}
+                                   </h3>
+                                   {project.company && (
+                                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                                             <Users className="w-3 h-3" />
+                                             <span className="truncate">{project.company}</span>
+                                        </div>
+                                   )}
+                              </div>
                          </div>
                          <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -381,6 +390,7 @@ const Projects = () => {
                </CardContent>
           </Card>
      )
+
 
      return (
           <div className="min-h-screen bg-background">
@@ -479,13 +489,22 @@ const Projects = () => {
                                                             {projects.map((project) => (
                                                                  <TableRow key={project.id}>
                                                                       <TableCell>
-                                                                           <div>
-                                                                                <div className="font-medium text-card-foreground">{project.title}</div>
-                                                                                {project.description && (
-                                                                                     <div className="text-sm text-muted-foreground truncate max-w-xs">
-                                                                                          {project.description}
-                                                                                     </div>
+                                                                           <div className="flex items-center gap-3">
+                                                                                {project.image_url && (
+                                                                                     <img
+                                                                                          src={project.image_url}
+                                                                                          alt={project.title}
+                                                                                          className="w-[35px] h-[35px] rounded-full object-cover border border-border flex-shrink-0"
+                                                                                     />
                                                                                 )}
+                                                                                <div>
+                                                                                     <div className="font-medium text-card-foreground">{project.title}</div>
+                                                                                     {project.description && (
+                                                                                          <div className="text-sm text-muted-foreground truncate max-w-xs">
+                                                                                               {project.description}
+                                                                                          </div>
+                                                                                     )}
+                                                                                </div>
                                                                            </div>
                                                                       </TableCell>
                                                                       <TableCell>
