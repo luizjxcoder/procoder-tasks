@@ -12,7 +12,7 @@ import { RecentSalesActivity } from "@/components/RecentSalesActivity"
 import { RecentBriefings } from "@/components/RecentBriefings"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, TrendingUp, Users, Clock, Target } from "lucide-react"
+import { Plus, TrendingUp, Users, Clock, Target, DollarSign } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useAuth } from "@/hooks/useAuth"
 import { useSettings } from "@/contexts/SettingsContext"
@@ -57,7 +57,8 @@ const Index = () => {
           { label: "Total de Projetos", value: "0", icon: Target, color: "text-primary" },
           { label: "Tarefas Concluídas", value: "0", icon: TrendingUp, color: "text-success" },
           { label: "Tarefas + Subtarefas Ativas", value: "0", icon: Clock, color: "text-warning" },
-          { label: "Total de Vendas", value: "0", icon: Users, color: "text-info" },
+          { label: "Total de Vendas", value: "0", icon: DollarSign, color: "text-info" },
+          { label: "Total de Clientes", value: "0", icon: Users, color: "text-accent" }
      ])
 
      const [realProjects, setRealProjects] = useState<any[]>([])
@@ -119,19 +120,35 @@ const Index = () => {
                     console.warn("Erro ao buscar vendas:", e)
                }
 
+               // Buscar clientes (opcional)
+               let customersData: any[] = []
+               try {
+                    const { data, error } = await supabase
+                         .from('customers')
+                         .select('*')
+                         .eq('user_id', user.id)
+                    if (!error && data) customersData = data
+                    else if (error) console.warn('Erro ao buscar clientes (ignorando):', error.message)
+               } catch (e) {
+                    console.warn('Falha inesperada ao buscar clientes (ignorando):', e)
+               }
+
+
                // -----------------------------
-               // 📊 ESTATÍSTICAS CORRETAS
+               // 📊 CALCULO DE ESTATÍSTICAS ATUAIS
                // -----------------------------
                const totalProjects = allProjects?.length || 0
                const completedTasks = tasksData.filter(t => t.status === "completed").length
                const activeTasks = tasksData.filter(t => t.status !== "completed").length
                const totalSales = salesData?.length || 0
+               const totalCustomers = customersData?.length || 0
 
                setStats([
                     { label: "Total de Projetos", value: totalProjects.toString(), icon: Target, color: "text-primary" },
                     { label: "Tarefas Concluídas", value: completedTasks.toString(), icon: TrendingUp, color: "text-success" },
                     { label: "Tarefas + Subtarefas Ativas", value: activeTasks.toString(), icon: Clock, color: "text-warning" },
-                    { label: "Total de Vendas", value: totalSales.toString(), icon: Users, color: "text-info" },
+                    { label: "Total de Vendas", value: totalSales.toString(), icon: DollarSign, color: "text-info" },
+                    { label: "Total de Clientes", value: totalCustomers.toString(), icon: Users, color: "text-accent" },
                ])
 
                // -----------------------------
@@ -217,8 +234,8 @@ const Index = () => {
                                    </Button>
                               </div>
 
-                              {/* Stats */}
-                              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                              {/* CARDS DE STATUS */}
+                              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 mb-8">
                                    {stats.map((stat, i) => (
                                         <div key={i} className="bg-gradient-card border border-border rounded-xl p-6 shadow-card">
                                              <div className="flex items-center justify-between">
