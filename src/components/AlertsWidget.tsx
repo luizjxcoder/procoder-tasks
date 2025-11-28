@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Bell, Clock, AlertTriangle, Calendar } from "lucide-react"
@@ -19,6 +19,7 @@ interface Alert {
 
 export const AlertsWidget = () => {
      const { user } = useAuth()
+     const navigate = useNavigate()
      const [alerts, setAlerts] = useState<Alert[]>([])
      const [loading, setLoading] = useState(true)
 
@@ -129,6 +130,15 @@ export const AlertsWidget = () => {
           }
      }
 
+     const handleAlertClick = (alert: Alert) => {
+          if (alert.type === 'task') {
+               navigate('/tasks')
+          } else if (alert.type === 'project') {
+               navigate('/projects')
+          }
+     }
+
+
      return (
           <div className="bg-gradient-card border border-border rounded-xl p-2 shadow-card">
                {/* Header */}
@@ -152,9 +162,11 @@ export const AlertsWidget = () => {
                          alerts.map((alert) => (
                               <div
                                    key={alert.id}
-                                   className={`p-1.5 rounded border ${alert.overdue
-                                        ? 'border-destructive/20 bg-destructive/5'
-                                        : 'border-border bg-background/50'
+                                   onClick={() => handleAlertClick(alert)}
+                                   className={`p-1.5 rounded border cursor-pointer
+                                        ${alert.overdue
+                                             ? 'border-destructive/20 bg-destructive/5'
+                                             : 'border-border bg-background/50'
                                         } hover:bg-background/80 transition-colors`}
                               >
                                    <div className="flex items-start justify-between">
