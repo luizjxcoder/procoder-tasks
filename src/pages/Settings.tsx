@@ -540,7 +540,7 @@ export default function Settings() {
                          <main className="flex-1 p-6">
                               {/* Header */}
                               <div className="flex items-center gap-4 mb-8">
-                                   <SidebarTrigger className="lg:hidden" />
+                                   <SidebarTrigger className="lg:hidden h-12 w-12 p-3 [&_svg]:w-6 [&_svg]:h-6" />
                                    <div className="flex items-center gap-3">
                                         <div className="p-2 rounded-lg bg-gradient-primary">
                                              <SettingsIcon className="w-6 h-6 text-primary-foreground" />

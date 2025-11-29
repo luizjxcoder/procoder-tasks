@@ -241,7 +241,7 @@ export default function Notes() {
                          {/* Header */}
                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                               <div className="flex items-center gap-2">
-                                   <SidebarTrigger className="lg:hidden" />
+                                   <SidebarTrigger className="lg:hidden h-12 w-12 p-3 [&_svg]:w-6 [&_svg]:h-6" />
                                    <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary" />
                                    <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-foreground">Notas e Ideias</h2>
                               </div>

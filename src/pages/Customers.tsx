@@ -341,7 +341,7 @@ export default function Customers() {
                               {/* Header */}
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                                    <div className="flex items-center gap-4">
-                                        <SidebarTrigger className="lg:hidden" />
+                                        <SidebarTrigger className="lg:hidden h-12 w-12 p-3 [&_svg]:w-6 [&_svg]:h-6" />
                                         <div>
                                              <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
                                                   <UsersIcon className="w-5 h-5 sm:w-6 sm:h-6" />

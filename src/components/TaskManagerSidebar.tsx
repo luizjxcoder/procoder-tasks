@@ -27,12 +27,16 @@ import {
      SidebarMenuItem,
      useSidebar,
 } from "@/components/ui/sidebar"
+import {
+     Sheet,
+     SheetContent,
+} from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 
 
 export function TaskManagerSidebar() {
-     const { state } = useSidebar()
+     const { state, open, setOpen, isMobile, openMobile, setOpenMobile } = useSidebar()
      const location = useLocation()
      const navigate = useNavigate()
      const { user, signOut } = useAuth()
@@ -41,6 +45,9 @@ export function TaskManagerSidebar() {
      const { toast } = useToast()
      const currentPath = location.pathname
      const collapsed = state === "collapsed"
+
+     // Para tablets/mobile, usar o estado mobile do sidebar
+     const isTabletOrMobile = isMobile
 
      // Menu items básicos
      const baseMenuItems = [
@@ -97,71 +104,107 @@ export function TaskManagerSidebar() {
           return `${baseClass} text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground`
      }
 
+     const handleNavClick = (url: string) => {
+          navigate(url)
+          // Fechar o drawer em tablets/mobile após navegação
+          if (isTabletOrMobile) {
+               setOpenMobile(false)
+          }
+     }
+
+     // Conteúdo do menu (reutilizado em ambas as versões)
+     // Em drawer (tablet/mobile), sempre mostrar texto completo
+     const showFullContent = isTabletOrMobile || !collapsed
+
+     const menuContent = (
+          <>
+               {/* Logo */}
+               <button
+                    onClick={() => handleNavClick("/")}
+                    className="mb-8 flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+               >
+                    <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
+                         <img
+                              src={`${import.meta.env.BASE_URL}lovable-uploads/minhaLogo.png`}
+                              alt="Logo"
+                              className="w-full h-full object-contain"
+                         />
+                    </div>
+                    {showFullContent && (
+                         <h1 className="text-xl font-bold text-sidebar-foreground">{systemName}</h1>
+                    )}
+               </button>
+
+               {/* Navigation Menu */}
+               <SidebarGroup>
+                    <SidebarGroupContent>
+                         <SidebarMenu className="space-y-2">
+                              {menuItems.map((item) => (
+                                   <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton asChild className="p-0">
+                                             <button onClick={() => handleNavClick(item.url)} className={getNavClass(item.url)}>
+                                                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                                                  {showFullContent && <span className="font-medium">{item.title}</span>}
+                                             </button>
+                                        </SidebarMenuButton>
+                                   </SidebarMenuItem>
+                              ))}
+                         </SidebarMenu>
+                    </SidebarGroupContent>
+               </SidebarGroup>
+
+               {/* User Profile */}
+               {showFullContent && (
+                    <div className="mt-auto pt-6 border-t border-sidebar-border">
+                         <div className="flex items-center gap-3 p-3 rounded-lg bg-sidebar-accent mb-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center">
+                                   <span className="text-sm font-bold text-primary-foreground">
+                                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                                   </span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                   <p className="text-sm font-medium text-sidebar-foreground truncate">
+                                        {user?.email || 'Usuário'}
+                                   </p>
+                                   <p className="text-xs text-muted-foreground truncate">
+                                        {isAdmin ? 'Administrador' : 'Usuário'}
+                                   </p>
+                              </div>
+                         </div>
+                         <Button
+                              variant="ghost"
+                              className="w-full justify-start text-muted-foreground hover:text-foreground"
+                              onClick={handleSignOut}
+                         >
+                              <LogOut className="mr-2 h-4 w-4" />
+                              Sair
+                         </Button>
+                    </div>
+               )}
+          </>
+     )
+
+     // Para tablets/mobile: usar Sheet (drawer overlay)
+     if (isTabletOrMobile) {
+          return (
+               <Sheet open={openMobile} onOpenChange={setOpenMobile}>
+                    <SheetContent
+                         side="left"
+                         className="w-[280px] p-0 bg-gradient-sidebar border-r border-sidebar-border"
+                    >
+                         <div className="h-full flex flex-col p-4 sidebar-scroll">
+                              {menuContent}
+                         </div>
+                    </SheetContent>
+               </Sheet>
+          )
+     }
+
+     // Para desktop: usar Sidebar normal
      return (
           <Sidebar className="border-r border-sidebar-border bg-gradient-sidebar">
                <SidebarContent className="p-4 sidebar-scroll">
-                    {/* LOGO DO SIDEBAR */}
-                    <div className="mb-8 flex items-center gap-3">
-                         <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
-                              <img
-                                   src={`${import.meta.env.BASE_URL}lovable-uploads/minhaLogo.png`}
-                                   alt="Logo"
-                                   className="w-full h-full object-contain"
-                              />
-
-
-                         </div>
-                         {!collapsed && (
-                              <h1 className="text-xl font-bold text-sidebar-foreground">{systemName}</h1>
-                         )}
-                    </div>
-
-                    {/* Navigation Menu */}
-                    <SidebarGroup>
-                         <SidebarGroupContent>
-                              <SidebarMenu className="space-y-2">
-                                   {menuItems.map((item) => (
-                                        <SidebarMenuItem key={item.title}>
-                                             <SidebarMenuButton asChild className="p-0">
-                                                  <NavLink to={item.url} className={getNavClass(item.url)}>
-                                                       <item.icon className="w-5 h-5 flex-shrink-0" />
-                                                       {!collapsed && <span className="font-medium">{item.title}</span>}
-                                                  </NavLink>
-                                             </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                   ))}
-                              </SidebarMenu>
-                         </SidebarGroupContent>
-                    </SidebarGroup>
-
-                    {/* User Profile */}
-                    {!collapsed && (
-                         <div className="mt-auto pt-6 border-t border-sidebar-border">
-                              <div className="flex items-center gap-3 p-3 rounded-lg bg-sidebar-accent mb-3">
-                                   <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center">
-                                        <span className="text-sm font-bold text-primary-foreground">
-                                             {user?.email?.charAt(0).toUpperCase() || 'U'}
-                                        </span>
-                                   </div>
-                                   <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-sidebar-foreground truncate">
-                                             {user?.email || 'Usuário'}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground truncate">
-                                             {isAdmin ? 'Administrador' : 'Usuário'}
-                                        </p>
-                                   </div>
-                              </div>
-                              <Button
-                                   variant="ghost"
-                                   className="w-full justify-start text-muted-foreground hover:text-foreground"
-                                   onClick={handleSignOut}
-                              >
-                                   <LogOut className="mr-2 h-4 w-4" />
-                                   Sair
-                              </Button>
-                         </div>
-                    )}
+                    {menuContent}
                </SidebarContent>
           </Sidebar>
      )

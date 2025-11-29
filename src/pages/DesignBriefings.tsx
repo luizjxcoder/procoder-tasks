@@ -219,7 +219,7 @@ export default function DesignBriefings() {
                          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
                               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                    <div className="flex items-center gap-3">
-                                        <SidebarTrigger className="sm:hidden" />
+                                        <SidebarTrigger className="lg:hidden h-12 w-12 p-3 [&_svg]:w-6 [&_svg]:h-6" />
                                         <div>
                                              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Briefings de Design</h1>
                                              <p className="text-muted-foreground mt-1 text-sm sm:text-base">

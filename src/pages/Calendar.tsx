@@ -277,7 +277,7 @@ export default function Calendar() {
                          <div className="max-w-7xl mx-auto">
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                    <div className="flex items-center gap-4">
-                                        <SidebarTrigger className="lg:hidden" />
+                                        <SidebarTrigger className="lg:hidden h-12 w-12 p-3 [&_svg]:w-6 [&_svg]:h-6" />
                                         <div className="flex items-center gap-2">
                                              <CalendarIcon className="w-6 h-6 text-primary" />
                                              <h1 className="text-2xl sm:text-3xl font-bold">Calendário</h1>

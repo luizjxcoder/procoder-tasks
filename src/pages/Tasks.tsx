@@ -488,7 +488,7 @@ export default function Tasks() {
                               {/* Header */}
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                                    <div className="flex items-center gap-4">
-                                        <SidebarTrigger className="lg:hidden" />
+                                        <SidebarTrigger className="lg:hidden h-12 w-12 p-3 [&_svg]:w-6 [&_svg]:h-6" />
                                         <div>
                                              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Tasks</h1>
                                              <p className="text-sm sm:text-base text-muted-foreground mt-1">
