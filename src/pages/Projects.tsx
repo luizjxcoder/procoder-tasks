@@ -199,6 +199,7 @@ const Projects = () => {
                })
           }
      }, [editingProject, formData, toast])
+
      const handleDeleteClick = (project: Project) => {
           setDeletingProject(project)
           setIsDeleteOpen(true)
@@ -289,6 +290,11 @@ const Projects = () => {
           }
           resetForm()
      }, [resetForm])
+
+     // Calculate total budget
+     const totalBudget = projects.reduce((sum, project) => {
+          return sum + (project.budget || 0)
+     }, 0)
 
      // Mobile Card Component
      const ProjectCard = ({ project }: { project: Project }) => (
@@ -391,7 +397,6 @@ const Projects = () => {
           </Card>
      )
 
-
      return (
           <div className="min-h-screen bg-background">
                <SidebarProvider>
@@ -438,10 +443,15 @@ const Projects = () => {
                               {/* Projects List */}
                               <Card className="bg-gradient-card border border-border shadow-card">
                                    <CardHeader>
-                                        <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                             <span>Lista de Projetos</span>
-                                             <Badge variant="secondary">{projects.length}</Badge>
-                                        </CardTitle>
+                                        <div className="flex items-center justify-between gap-2">
+                                             <CardTitle className="flex items-center gap-2">
+                                                  <span>Lista de Projetos</span>
+                                                  <Badge variant="secondary">{projects.length}</Badge>
+                                             </CardTitle>
+                                             <div className="text-sm font-normal text-muted-foreground">
+                                                  TOTAL: <span className="font-bold text-foreground">R$ {totalBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                             </div>
+                                        </div>
                                    </CardHeader>
                                    <CardContent>
                                         {loading ? (
@@ -572,7 +582,6 @@ const Projects = () => {
                                                                                 >
                                                                                      <Edit className="w-4 h-4" />
                                                                                 </Button>
-
                                                                                 <Button
                                                                                      size="sm"
                                                                                      variant="ghost"
@@ -614,7 +623,6 @@ const Projects = () => {
                                         />
                                    </DialogContent>
                               </Dialog>
-
 
                               {/* Delete Confirmation Dialog */}
                               <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
