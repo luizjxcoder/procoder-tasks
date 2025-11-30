@@ -12,6 +12,7 @@ import {
      UserCircle,
      Palette
 } from "lucide-react"
+import defaultSidebarLogo from "@/assets/minhaLogo.png"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useRoles } from "@/hooks/useRoles"
@@ -124,19 +125,11 @@ export function TaskManagerSidebar() {
                     className="mb-8 flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
                >
                     <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-muted">
-                         {logoUrl ? (
-                              <img
-                                   src={`${import.meta.env.BASE_URL}${logoUrl}`}
-                                   alt="Logo personalizado"
-                                   className="w-full h-full object-contain"
-                              />
-                         ) : (
-                              <img
-                                   src={`${import.meta.env.BASE_URL}lovable-uploads/f11bb6d6-1c0f-4aa0-a897-7bb6abaf8a4e.png`}
-                                   alt="Logo padrão"
-                                   className="w-full h-full object-contain"
-                              />
-                         )}
+                         <img
+                              src={logoUrl || defaultSidebarLogo}
+                              alt={logoUrl ? "Logo personalizado" : "Logo padrão"}
+                              className="w-full h-full object-contain"
+                         />
                     </div>
 
                     {showFullContent && (
