@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      backup_logs: {
+        Row: {
+          backup_type: string
+          created_at: string
+          error_message: string | null
+          file_path: string | null
+          file_size: number | null
+          id: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          backup_type: string
+          created_at?: string
+          error_message?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          backup_type?: string
+          created_at?: string
+          error_message?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      backup_settings: {
+        Row: {
+          auto_backup_enabled: boolean
+          backup_frequency: string
+          backup_on_changes: boolean
+          created_at: string
+          id: string
+          last_backup_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_backup_enabled?: boolean
+          backup_frequency?: string
+          backup_on_changes?: boolean
+          created_at?: string
+          id?: string
+          last_backup_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_backup_enabled?: boolean
+          backup_frequency?: string
+          backup_on_changes?: boolean
+          created_at?: string
+          id?: string
+          last_backup_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           company_name: string | null
@@ -164,6 +230,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          logo_url: string | null
           updated_at: string
           user_id: string
         }
@@ -172,6 +239,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id?: string
+          logo_url?: string | null
           updated_at?: string
           user_id: string
         }
@@ -180,6 +248,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          logo_url?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -386,6 +455,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      should_trigger_backup: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"

@@ -41,7 +41,7 @@ export function TaskManagerSidebar() {
      const navigate = useNavigate()
      const { user, signOut } = useAuth()
      const { isAdmin } = useRoles()
-     const { systemName } = useSettings()
+     const { systemName, logoUrl } = useSettings()
      const { toast } = useToast()
      const currentPath = location.pathname
      const collapsed = state === "collapsed"
@@ -123,13 +123,22 @@ export function TaskManagerSidebar() {
                     onClick={() => handleNavClick("/")}
                     className="mb-8 flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
                >
-                    <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
-                         <img
-                              src={`${import.meta.env.BASE_URL}lovable-uploads/minhaLogo.png`}
-                              alt="Logo"
-                              className="w-full h-full object-contain"
-                         />
+                    <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-muted">
+                         {logoUrl ? (
+                              <img
+                                   src={`${import.meta.env.BASE_URL}${logoUrl}`}
+                                   alt="Logo personalizado"
+                                   className="w-full h-full object-contain"
+                              />
+                         ) : (
+                              <img
+                                   src={`${import.meta.env.BASE_URL}lovable-uploads/f11bb6d6-1c0f-4aa0-a897-7bb6abaf8a4e.png`}
+                                   alt="Logo padrão"
+                                   className="w-full h-full object-contain"
+                              />
+                         )}
                     </div>
+
                     {showFullContent && (
                          <h1 className="text-xl font-bold text-sidebar-foreground">{systemName}</h1>
                     )}

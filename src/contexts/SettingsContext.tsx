@@ -7,6 +7,8 @@ interface SettingsContextType {
      setSystemName: (name: string) => void
      userName: string
      setUserName: (name: string) => void
+     logoUrl: string
+     setLogoUrl: (url: string) => void
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
@@ -14,6 +16,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
      const [systemName, setSystemNameState] = useState("TaskManager")
      const [userName, setUserNameState] = useState("")
+     const [logoUrl, setLogoUrlState] = useState("")
 
      // Load from localStorage on mount
      useEffect(() => {
@@ -24,6 +27,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           const savedUserName = localStorage.getItem("user-name")
           if (savedUserName) {
                setUserNameState(savedUserName)
+          }
+          const savedLogoUrl = localStorage.getItem("logo-url")
+          if (savedLogoUrl) {
+               setLogoUrlState(savedLogoUrl)
           }
      }, [])
 
@@ -37,8 +44,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
           localStorage.setItem("user-name", name)
      }
 
+     const setLogoUrl = (url: string) => {
+          setLogoUrlState(url)
+          localStorage.setItem("logo-url", url)
+     }
+
      return (
-          <SettingsContext.Provider value={{ systemName, setSystemName, userName, setUserName }}>
+          <SettingsContext.Provider value={{ systemName, setSystemName, userName, setUserName, logoUrl, setLogoUrl }}>
                {children}
           </SettingsContext.Provider>
      )
@@ -52,7 +64,9 @@ export function useSettings() {
                systemName: "TaskManager",
                setSystemName: () => { },
                userName: "",
-               setUserName: () => { }
+               setUserName: () => { },
+               logoUrl: "",
+               setLogoUrl: () => { }
           }
      }
      return context
