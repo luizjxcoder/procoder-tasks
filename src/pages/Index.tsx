@@ -146,7 +146,7 @@ const Index = () => {
                setStats([
                     { label: "Total de Projetos", value: totalProjects.toString(), icon: Target, color: "text-primary" },
                     { label: "Tarefas Concluídas", value: completedTasks.toString(), icon: TrendingUp, color: "text-success" },
-                    { label: "Tarefas + Subtarefas Ativas", value: activeTasks.toString(), icon: Clock, color: "text-warning" },
+                    { label: "Tarefas + Subtarefas", value: activeTasks.toString(), icon: Clock, color: "text-warning" },
                     { label: "Total de Vendas", value: totalSales.toString(), icon: DollarSign, color: "text-info" },
                     { label: "Total de Clientes", value: totalCustomers.toString(), icon: Users, color: "text-accent" },
                ])
