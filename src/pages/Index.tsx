@@ -83,12 +83,13 @@ const Index = () => {
                // -----------------------------
                // 🔥 QUERY 2: TRAZER SÓ OS 3 MAIS RECENTES
                // -----------------------------
+               // Buscar os 4 projetos mais recentes
                const { data: recentProjects, error: recentProjectsError } = await supabase
                     .from("projects")
                     .select("*")
                     .eq("user_id", user.id)
                     .order("created_at", { ascending: false })
-                    .limit(3)
+                    .limit(4)
 
                if (recentProjectsError) throw recentProjectsError
 
@@ -255,57 +256,59 @@ const Index = () => {
                                    ))}
                               </div>
 
-                              {/* Widgets */}
-                              <div className="mb-4 sm:mb-6">
-                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                                        <TimeTracker />
-                                        <AlertsWidget />
-                                   </div>
-                              </div>
-
-                              {/* Projects & Tasks */}
+                              {/* Main Content Grid - Two Columns */}
                               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-                                   <div className="space-y-4 sm:space-y-6">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                             <h2 className="text-lg sm:text-xl font-semibold text-foreground">Projetos Recentes</h2>
-                                             <div className="flex items-center gap-2">
-                                                  <Badge variant="secondary">{realProjects.length}</Badge>
-                                                  {realProjects.length > 0 && (
-                                                       <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => navigate("/projects")}
-                                                            className="text-primary hover:text-white"
-                                                       >
-                                                            Ver Todos
-                                                       </Button>
-                                                  )}
-                                             </div>
-                                        </div>
+                                   {/* Left Column - Pomodoro + Projects */}
+                                   <div className="space-y-6">
+                                        <TimeTracker />
 
-                                        {loading ? (
-                                             <div className="text-center text-muted-foreground">Carregando projetos...</div>
-                                        ) : realProjects.length > 0 ? (
-                                             realProjects.map((project, i) => (
-                                                  <div key={i} className="cursor-pointer" onClick={() => navigate("/projects")}>
-                                                       <ProjectCard {...project} />
+                                        {/* Projetos Recentes */}
+                                        <div className="space-y-6">
+                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                  <h2 className="text-lg sm:text-xl font-semibold text-foreground">Projetos Recentes</h2>
+                                                  <div className="flex items-center gap-2">
+                                                       <Badge variant="secondary">{realProjects.length}</Badge>
+                                                       {realProjects.length > 0 && (
+                                                            <Button
+                                                                 variant="ghost"
+                                                                 size="sm"
+                                                                 onClick={() => navigate('/projects')}
+                                                                 className="text-primary hover:text-white"
+                                                            >
+                                                                 Ver Todos
+                                                            </Button>
+                                                       )}
                                                   </div>
-                                             ))
-                                        ) : (
-                                             <div className="text-center text-muted-foreground">
-                                                  <p>Nenhum projeto encontrado.</p>
-                                                  <Button
-                                                       className="mt-4 bg-gradient-primary hover:bg-gradient-primary/90"
-                                                       onClick={() => navigate("/projects")}
-                                                  >
-                                                       <Plus className="w-4 h-4 mr-2" />
-                                                       Criar Primeiro Projeto
-                                                  </Button>
                                              </div>
-                                        )}
+
+                                             {loading ? (
+                                                  <div className="text-center text-muted-foreground">Carregando projetos...</div>
+                                             ) : realProjects.length > 0 ? (
+                                                  realProjects.slice(0, 4).map((project, index) => (
+                                                       <div key={index} className="cursor-pointer" onClick={() => navigate('/projects')}>
+                                                            <ProjectCard {...project} />
+                                                       </div>
+                                                  ))
+                                             ) : (
+                                                  <div className="text-center text-muted-foreground">
+                                                       <p>Nenhum projeto encontrado.</p>
+                                                       <Button
+                                                            className="mt-4 bg-gradient-primary hover:bg-gradient-primary/90"
+                                                            onClick={() => navigate('/projects')}
+                                                       >
+                                                            <Plus className="w-4 h-4 mr-2" />
+                                                            Criar Primeiro Projeto
+                                                       </Button>
+                                                  </div>
+                                             )}
+                                        </div>
                                    </div>
 
-                                   <div className="space-y-4 sm:space-y-6">
+
+                                   {/* Right Column - Alerts + Tasks + Calendar */}
+                                   <div className="space-y-6">
+                                        <AlertsWidget />
+
                                         <TaskList
                                              tasks={userTasks.slice(0, 6).map(task => ({
                                                   id: task.id,

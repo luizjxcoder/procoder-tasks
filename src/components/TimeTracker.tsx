@@ -196,7 +196,7 @@ export function TimeTracker() {
   }
 
   return (
-    <div className={`bg-gradient-card border border-border rounded-xl p-2 shadow-card transition-all duration-300 ${
+      <div className={`bg-gradient-card border border-border rounded-xl p-2 shadow-card transition-all duration-300 lg:h-[150px] lg:flex lg:flex-col lg:justify-between ${
       isAlertActive 
         ? 'animate-pulse bg-primary/20 border-primary shadow-[0_0_20px_hsl(var(--primary)/0.5)]' 
         : ''
