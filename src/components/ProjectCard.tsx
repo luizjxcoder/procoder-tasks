@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Flag, Eye, Edit, Trash2 } from "lucide-react"
+import { Calendar, Flag, Eye, Edit, Trash2 } from "lucide-react"
 
 interface TeamMember {
      id: string
@@ -83,10 +83,9 @@ export function ProjectCard({
                          </div>
                     </div>
 
-                    <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${priorityBgColors[priority]} flex-shrink-0`}>
-                         <Flag className={`w-3 h-3 ${priorityColors[priority]}`} />
-                         <span className={`text-xs font-medium capitalize ${priorityColors[priority]} hidden sm:inline`}>
-                              {priority}
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 flex-shrink-0">
+                         <span className="text-xs sm:text-sm font-semibold text-primary">
+                              {progress}%
                          </span>
                     </div>
                </div>
@@ -102,30 +101,18 @@ export function ProjectCard({
                     <Progress value={progress} className="h-2" />
                </div>
 
-               {/* Team Avatars */}
+               {/* Priority Indicator */}
                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div className="flex items-center gap-2">
-                         <Users className="w-4 h-4 text-muted-foreground" />
-                         <div className="flex -space-x-2">
-                              {team.slice(0, 3).map((member, index) => (
-                                   <div
-                                        key={member.id}
-                                        className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-card bg-gradient-primary flex items-center justify-center"
-                                        style={{ zIndex: team.length - index }}
-                                   >
-                                        <span className="text-xs font-medium text-primary-foreground">
-                                             {member.name.charAt(0)}
-                                        </span>
-                                   </div>
-                              ))}
-                              {team.length > 3 && (
-                                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-card bg-muted flex items-center justify-center">
-                                        <span className="text-xs font-medium text-muted-foreground">
-                                             +{team.length - 3}
-                                        </span>
-                                   </div>
-                              )}
+                         <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${priority === 'high' ? 'bg-priority-high/20' :
+                                   priority === 'medium' ? 'bg-priority-medium/20' :
+                                        'bg-priority-low/20'
+                              }`}>
+                              <Flag className={`w-4 h-4 sm:w-5 sm:h-5 ${priorityColors[priority]}`} />
                          </div>
+                         <span className={`text-xs sm:text-sm font-medium capitalize ${priorityColors[priority]}`}>
+                              {priority === 'high' ? 'Alta' : priority === 'medium' ? 'Média' : 'Baixa'}
+                         </span>
                     </div>
 
                     <div className="flex items-center gap-1 text-muted-foreground">
