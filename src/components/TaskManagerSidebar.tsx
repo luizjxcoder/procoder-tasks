@@ -10,7 +10,8 @@ import {
      DollarSign,
      Users,
      UserCircle,
-     Palette
+     Palette,
+     TrendingDown
 } from "lucide-react"
 import defaultSidebarLogo from "@/assets/minhaLogo.png"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
@@ -58,6 +59,7 @@ export function TaskManagerSidebar() {
           { title: "Calendário", url: "/calendar", icon: Calendar },
           { title: "Notas", url: "/notes", icon: BookOpen },
           { title: "Vendas", url: "/sales", icon: DollarSign },
+          { title: "Investimentos", url: "/investments", icon: TrendingDown },
           { title: "Clientes", url: "/customers", icon: UserCircle },
           { title: "Briefings Design", url: "/design-briefings", icon: Palette },
           { title: "Relatórios", url: "/reports", icon: FileText },

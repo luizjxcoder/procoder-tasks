@@ -14,6 +14,7 @@ import Notes from "./pages/Notes"
 import Reports from "./pages/Reports"
 import Settings from "./pages/Settings"
 import Sales from "./pages/Sales"
+import Investments from "./pages/Investments"
 import Customers from "./pages/Customers"
 import Auth from "./pages/Auth"
 import UserManagement from "./pages/UserManagement"
@@ -112,6 +113,14 @@ const App = () => (
                                              element={
                                                   <ProtectedRoute>
                                                        <Sales />
+                                                  </ProtectedRoute>
+                                             }
+                                        />
+                                        <Route
+                                             path="/investments"
+                                             element={
+                                                  <ProtectedRoute>
+                                                       <Investments />
                                                   </ProtectedRoute>
                                              }
                                         />
