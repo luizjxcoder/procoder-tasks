@@ -12,9 +12,17 @@ import { TaskManagerSidebar } from "@/components/TaskManagerSidebar"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { useRoles } from "@/hooks/useRoles"
-import { Loader2, UserPlus, Shield, User, Pencil, Trash2 } from "lucide-react"
+import { Loader2, UserPlus, Shield, User, Pencil, Trash2, HardDrive, Database, Server } from "lucide-react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useAuth } from "@/hooks/useAuth"
+import { Progress } from "@/components/ui/progress"
+
+type StoragePlan = 'simples' | 'pro' | 'ultra'
+
+interface StorageQuota {
+     plan: StoragePlan
+     storage_used: number
+}
 
 interface Profile {
      id: string
@@ -23,6 +31,27 @@ interface Profile {
      full_name: string | null
      created_at: string
      roles: string[]
+     storage_quota?: StorageQuota
+}
+
+const STORAGE_LIMITS: Record<StoragePlan, number> = {
+     simples: 104857600,    // 100 MB
+     pro: 524288000,        // 500 MB
+     ultra: 2147483648      // 2 GB
+}
+
+const STORAGE_LABELS: Record<StoragePlan, string> = {
+     simples: '100 MB',
+     pro: '500 MB',
+     ultra: '2 GB'
+}
+
+const formatBytes = (bytes: number): string => {
+     if (bytes === 0) return '0 B'
+     const k = 1024
+     const sizes = ['B', 'KB', 'MB', 'GB']
+     const i = Math.floor(Math.log(bytes) / Math.log(k))
+     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 const UserManagement = () => {
@@ -38,11 +67,13 @@ const UserManagement = () => {
      const [password, setPassword] = useState("")
      const [fullName, setFullName] = useState("")
      const [role, setRole] = useState<"admin" | "user">("user")
+     const [storagePlan, setStoragePlan] = useState<StoragePlan>("simples")
 
      const [editEmail, setEditEmail] = useState("")
      const [editPassword, setEditPassword] = useState("")
      const [editFullName, setEditFullName] = useState("")
      const [editRole, setEditRole] = useState<"admin" | "user">("user")
+     const [editStoragePlan, setEditStoragePlan] = useState<StoragePlan>("simples")
      const [editLoading, setEditLoading] = useState(false)
      const [deleteLoading, setDeleteLoading] = useState(false)
 
@@ -65,22 +96,30 @@ const UserManagement = () => {
 
                if (profilesError) throw profilesError
 
-               // Buscar roles para cada usuário
-               const usersWithRoles = await Promise.all(
+               // Buscar roles e quotas para cada usuário
+               const usersWithRolesAndQuotas = await Promise.all(
                     profiles.map(async (profile) => {
-                         const { data: userRoles } = await supabase
-                              .from("user_roles")
-                              .select("role")
-                              .eq("user_id", profile.user_id)
+                         const [rolesResult, quotaResult] = await Promise.all([
+                              supabase
+                                   .from("user_roles")
+                                   .select("role")
+                                   .eq("user_id", profile.user_id),
+                              supabase
+                                   .from("storage_quotas")
+                                   .select("plan, storage_used")
+                                   .eq("user_id", profile.user_id)
+                                   .maybeSingle()
+                         ])
 
                          return {
                               ...profile,
-                              roles: userRoles?.map((r) => r.role) || []
+                              roles: rolesResult.data?.map((r) => r.role) || [],
+                              storage_quota: quotaResult.data as StorageQuota | undefined
                          }
                     })
                )
 
-               setUsers(usersWithRoles)
+               setUsers(usersWithRolesAndQuotas)
           } catch (error) {
                console.error("Error fetching users:", error)
                toast({
@@ -109,7 +148,8 @@ const UserManagement = () => {
                          email,
                          password,
                          fullName,
-                         role
+                         role,
+                         storagePlan
                     }
                })
 
@@ -117,13 +157,14 @@ const UserManagement = () => {
 
                toast({
                     title: "Usuário criado com sucesso!",
-                    description: `${email} foi adicionado ao sistema`
+                    description: `${email} foi adicionado ao sistema com plano ${storagePlan}`
                })
 
                setEmail("")
                setPassword("")
                setFullName("")
                setRole("user")
+               setStoragePlan("simples")
                setIsDialogOpen(false)
 
                fetchUsers()
@@ -144,6 +185,7 @@ const UserManagement = () => {
           setEditEmail(profile.email)
           setEditFullName(profile.full_name || "")
           setEditRole(profile.roles.includes("admin") ? "admin" : "user")
+          setEditStoragePlan(profile.storage_quota?.plan || "simples")
           setEditPassword("")
           setIsEditDialogOpen(true)
      }
@@ -159,7 +201,8 @@ const UserManagement = () => {
                     userId: selectedUser.user_id,
                     email: editEmail,
                     fullName: editFullName,
-                    role: editRole
+                    role: editRole,
+                    storagePlan: editStoragePlan
                }
 
                if (editPassword) {
@@ -229,6 +272,41 @@ const UserManagement = () => {
           }
      }
 
+     const getStoragePlanBadge = (plan: StoragePlan) => {
+          const variants: Record<StoragePlan, { variant: "default" | "secondary" | "outline", icon: React.ReactNode, className: string }> = {
+               simples: { variant: "secondary", icon: <HardDrive className="h-3 w-3 mr-1" />, className: "" },
+               pro: { variant: "default", icon: <Database className="h-3 w-3 mr-1" />, className: "bg-blue-500 hover:bg-blue-600" },
+               ultra: { variant: "default", icon: <Server className="h-3 w-3 mr-1" />, className: "bg-purple-500 hover:bg-purple-600" }
+          }
+          const config = variants[plan]
+          return (
+               <Badge variant={config.variant} className={config.className}>
+                    {config.icon}
+                    {plan.charAt(0).toUpperCase() + plan.slice(1)}
+               </Badge>
+          )
+     }
+
+     const getStorageUsageInfo = (quota?: StorageQuota) => {
+          if (!quota) return null
+
+          const limit = STORAGE_LIMITS[quota.plan]
+          const percentage = Math.min((quota.storage_used / limit) * 100, 100)
+
+          return (
+               <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                         <span>{formatBytes(quota.storage_used)}</span>
+                         <span>{STORAGE_LABELS[quota.plan]}</span>
+                    </div>
+                    <Progress value={percentage} className="h-1.5" />
+                    <div className="text-xs text-muted-foreground text-right">
+                         {percentage.toFixed(1)}%
+                    </div>
+               </div>
+          )
+     }
+
      if (rolesLoading) {
           return (
                <div className="min-h-screen bg-background">
@@ -294,7 +372,7 @@ const UserManagement = () => {
                                                   Criar Usuário
                                              </Button>
                                         </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[425px] w-[95vw] sm:w-full">
+                                        <DialogContent className="sm:max-w-[425px] w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
                                              <DialogHeader>
                                                   <DialogTitle>Criar Novo Usuário</DialogTitle>
                                                   <DialogDescription>
@@ -343,8 +421,46 @@ const UserManagement = () => {
                                                                  <SelectValue />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                 <SelectItem value="user">Usuário</SelectItem>
-                                                                 <SelectItem value="admin">Administrador</SelectItem>
+                                                                 <SelectItem value="user">
+                                                                      <div className="flex items-center gap-2">
+                                                                           <User className="h-4 w-4" />
+                                                                           Usuário
+                                                                      </div>
+                                                                 </SelectItem>
+                                                                 <SelectItem value="admin">
+                                                                      <div className="flex items-center gap-2">
+                                                                           <Shield className="h-4 w-4" />
+                                                                           Administrador
+                                                                      </div>
+                                                                 </SelectItem>
+                                                            </SelectContent>
+                                                       </Select>
+                                                  </div>
+                                                  <div className="space-y-2">
+                                                       <Label>Plano de Armazenamento</Label>
+                                                       <Select value={storagePlan} onValueChange={(value: StoragePlan) => setStoragePlan(value)}>
+                                                            <SelectTrigger>
+                                                                 <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                 <SelectItem value="simples">
+                                                                      <div className="flex items-center gap-2">
+                                                                           <HardDrive className="h-4 w-4" />
+                                                                           Simples (100 MB)
+                                                                      </div>
+                                                                 </SelectItem>
+                                                                 <SelectItem value="pro">
+                                                                      <div className="flex items-center gap-2">
+                                                                           <Database className="h-4 w-4 text-blue-500" />
+                                                                           Pro (500 MB)
+                                                                      </div>
+                                                                 </SelectItem>
+                                                                 <SelectItem value="ultra">
+                                                                      <div className="flex items-center gap-2">
+                                                                           <Server className="h-4 w-4 text-purple-500" />
+                                                                           Ultra (2 GB)
+                                                                      </div>
+                                                                 </SelectItem>
                                                             </SelectContent>
                                                        </Select>
                                                   </div>
@@ -372,13 +488,15 @@ const UserManagement = () => {
                                         ) : (
                                              <>
                                                   {/* Desktop Table */}
-                                                  <div className="hidden sm:block overflow-x-auto">
+                                                  <div className="hidden lg:block overflow-x-auto">
                                                        <Table>
                                                             <TableHeader>
                                                                  <TableRow>
                                                                       <TableHead>Nome</TableHead>
                                                                       <TableHead>Email</TableHead>
                                                                       <TableHead>Papel</TableHead>
+                                                                      <TableHead>Armazenamento</TableHead>
+                                                                      <TableHead>Uso</TableHead>
                                                                       <TableHead>Criado em</TableHead>
                                                                       <TableHead className="text-right">Ações</TableHead>
                                                                  </TableRow>
@@ -405,6 +523,12 @@ const UserManagement = () => {
                                                                                           </Badge>
                                                                                      ))}
                                                                                 </div>
+                                                                           </TableCell>
+                                                                           <TableCell>
+                                                                                {profile.storage_quota && getStoragePlanBadge(profile.storage_quota.plan)}
+                                                                           </TableCell>
+                                                                           <TableCell className="min-w-[120px]">
+                                                                                {getStorageUsageInfo(profile.storage_quota)}
                                                                            </TableCell>
                                                                            <TableCell>
                                                                                 {new Date(profile.created_at).toLocaleDateString("pt-BR")}
@@ -434,8 +558,8 @@ const UserManagement = () => {
                                                        </Table>
                                                   </div>
 
-                                                  {/* Mobile Cards */}
-                                                  <div className="sm:hidden space-y-4">
+                                                  {/* Mobile/Tablet Cards */}
+                                                  <div className="lg:hidden space-y-4">
                                                        {users.map((profile) => (
                                                             <Card key={profile.id}>
                                                                  <CardContent className="pt-4 space-y-3">
@@ -447,22 +571,32 @@ const UserManagement = () => {
                                                                            <p className="text-xs text-muted-foreground mb-1">Email</p>
                                                                            <p className="text-sm break-all">{profile.email}</p>
                                                                       </div>
-                                                                      <div>
-                                                                           <p className="text-xs text-muted-foreground mb-2">Papel</p>
-                                                                           <div className="flex gap-1 flex-wrap">
-                                                                                {profile.roles.map((role) => (
-                                                                                     <Badge
-                                                                                          key={role}
-                                                                                          variant={role === "admin" ? "default" : "secondary"}
-                                                                                     >
-                                                                                          {role === "admin" ? (
-                                                                                               <><Shield className="h-3 w-3 mr-1" /> Admin</>
-                                                                                          ) : (
-                                                                                               <><User className="h-3 w-3 mr-1" /> Usuário</>
-                                                                                          )}
-                                                                                     </Badge>
-                                                                                ))}
+                                                                      <div className="flex gap-4">
+                                                                           <div>
+                                                                                <p className="text-xs text-muted-foreground mb-2">Papel</p>
+                                                                                <div className="flex gap-1 flex-wrap">
+                                                                                     {profile.roles.map((role) => (
+                                                                                          <Badge
+                                                                                               key={role}
+                                                                                               variant={role === "admin" ? "default" : "secondary"}
+                                                                                          >
+                                                                                               {role === "admin" ? (
+                                                                                                    <><Shield className="h-3 w-3 mr-1" /> Admin</>
+                                                                                               ) : (
+                                                                                                    <><User className="h-3 w-3 mr-1" /> Usuário</>
+                                                                                               )}
+                                                                                          </Badge>
+                                                                                     ))}
+                                                                                </div>
                                                                            </div>
+                                                                           <div>
+                                                                                <p className="text-xs text-muted-foreground mb-2">Plano</p>
+                                                                                {profile.storage_quota && getStoragePlanBadge(profile.storage_quota.plan)}
+                                                                           </div>
+                                                                      </div>
+                                                                      <div>
+                                                                           <p className="text-xs text-muted-foreground mb-2">Uso de Armazenamento</p>
+                                                                           {getStorageUsageInfo(profile.storage_quota)}
                                                                       </div>
                                                                       <div>
                                                                            <p className="text-xs text-muted-foreground mb-1">Criado em</p>
@@ -500,7 +634,7 @@ const UserManagement = () => {
 
                               {/* Edit Dialog */}
                               <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                                   <DialogContent className="sm:max-w-[425px] w-[95vw] sm:w-full">
+                                   <DialogContent className="sm:max-w-[425px] w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
                                         <DialogHeader>
                                              <DialogTitle>Editar Usuário</DialogTitle>
                                              <DialogDescription>
@@ -546,8 +680,46 @@ const UserManagement = () => {
                                                             <SelectValue />
                                                        </SelectTrigger>
                                                        <SelectContent>
-                                                            <SelectItem value="user">Usuário</SelectItem>
-                                                            <SelectItem value="admin">Administrador</SelectItem>
+                                                            <SelectItem value="user">
+                                                                 <div className="flex items-center gap-2">
+                                                                      <User className="h-4 w-4" />
+                                                                      Usuário
+                                                                 </div>
+                                                            </SelectItem>
+                                                            <SelectItem value="admin">
+                                                                 <div className="flex items-center gap-2">
+                                                                      <Shield className="h-4 w-4" />
+                                                                      Administrador
+                                                                 </div>
+                                                            </SelectItem>
+                                                       </SelectContent>
+                                                  </Select>
+                                             </div>
+                                             <div className="space-y-2">
+                                                  <Label>Plano de Armazenamento</Label>
+                                                  <Select value={editStoragePlan} onValueChange={(value: StoragePlan) => setEditStoragePlan(value)}>
+                                                       <SelectTrigger>
+                                                            <SelectValue />
+                                                       </SelectTrigger>
+                                                       <SelectContent>
+                                                            <SelectItem value="simples">
+                                                                 <div className="flex items-center gap-2">
+                                                                      <HardDrive className="h-4 w-4" />
+                                                                      Simples (100 MB)
+                                                                 </div>
+                                                            </SelectItem>
+                                                            <SelectItem value="pro">
+                                                                 <div className="flex items-center gap-2">
+                                                                      <Database className="h-4 w-4 text-blue-500" />
+                                                                      Pro (500 MB)
+                                                                 </div>
+                                                            </SelectItem>
+                                                            <SelectItem value="ultra">
+                                                                 <div className="flex items-center gap-2">
+                                                                      <Server className="h-4 w-4 text-purple-500" />
+                                                                      Ultra (2 GB)
+                                                                 </div>
+                                                            </SelectItem>
                                                        </SelectContent>
                                                   </Select>
                                              </div>

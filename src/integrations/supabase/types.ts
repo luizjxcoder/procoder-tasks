@@ -362,6 +362,33 @@ export type Database = {
         }
         Relationships: []
       }
+      storage_quotas: {
+        Row: {
+          created_at: string
+          id: string
+          plan: Database["public"]["Enums"]["storage_plan"]
+          storage_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan?: Database["public"]["Enums"]["storage_plan"]
+          storage_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan?: Database["public"]["Enums"]["storage_plan"]
+          storage_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           created_at: string
@@ -448,6 +475,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_upload: {
+        Args: { p_file_size: number; p_user_id: string }
+        Returns: boolean
+      }
+      get_storage_limit: {
+        Args: { p_plan: Database["public"]["Enums"]["storage_plan"] }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -459,6 +494,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      storage_plan: "simples" | "pro" | "ultra"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -587,6 +623,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      storage_plan: ["simples", "pro", "ultra"],
     },
   },
 } as const

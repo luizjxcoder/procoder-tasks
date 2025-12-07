@@ -45,7 +45,7 @@ serve(async (req) => {
       )
     }
 
-    const { userId, email, fullName, role, password } = await req.json()
+    const { userId, email, fullName, role, password, storagePlan } = await req.json()
 
     if (!userId) {
       return new Response(
@@ -103,6 +103,27 @@ serve(async (req) => {
         throw roleError
       }
     }
+
+    // Atualizar plano de armazenamento se fornecido (usar upsert para criar se não existir)
+    if (storagePlan) {
+      const { error: planError } = await supabaseAdmin
+        .from('storage_quotas')
+        .upsert({ 
+          user_id: userId, 
+          plan: storagePlan,
+          storage_used: 0
+        }, { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        })
+
+      if (planError) {
+        console.error('Storage plan update error:', planError)
+        throw planError
+      }
+    }
+
+    console.log('User updated successfully:', userId, 'storage plan:', storagePlan)
 
     return new Response(
       JSON.stringify({ message: 'User updated successfully' }),

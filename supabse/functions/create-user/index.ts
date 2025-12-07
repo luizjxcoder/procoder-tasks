@@ -57,7 +57,7 @@ serve(async (req) => {
     }
 
     // Pegar dados do request
-    const { email, password, fullName, role } = await req.json();
+    const { email, password, fullName, role, storagePlan } = await req.json();
 
     if (!email || !password || !fullName) {
       return new Response(
@@ -97,7 +97,20 @@ serve(async (req) => {
       }
     }
 
-    console.log('User created successfully:', newUser.user.email);
+    // Atualizar plano de armazenamento se diferente do padrão
+    if (storagePlan && storagePlan !== 'simples') {
+      const { error: planError } = await supabaseAdmin
+        .from('storage_quotas')
+        .update({ plan: storagePlan })
+        .eq('user_id', newUser.user.id);
+
+      if (planError) {
+        console.error('Storage plan update error:', planError);
+        // Não falhar completamente se o plano não for atualizado
+      }
+    }
+
+    console.log('User created successfully:', newUser.user.email, 'with storage plan:', storagePlan || 'simples');
 
     return new Response(
       JSON.stringify({
@@ -105,7 +118,8 @@ serve(async (req) => {
         user: {
           id: newUser.user.id,
           email: newUser.user.email,
-          full_name: fullName
+          full_name: fullName,
+          storage_plan: storagePlan || 'simples'
         }
       }),
       {
