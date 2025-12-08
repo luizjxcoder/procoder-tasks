@@ -399,11 +399,34 @@ export default function Notes() {
                                         </Button>
                                    )}
                               </div>
+
                          ) : viewMode === 'cards' ? (
-                              // Cards View
+                              // Cards Notas e Ideias View
                               <div className="grid gap-2.5 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                                    {filteredNotes.map((note) => (
-                                        <Card key={note.id} className="hover:shadow-md transition-shadow flex flex-col">
+                                        <Card
+                                             key={note.id}
+                                             className="
+    relative flex flex-col overflow-hidden
+    rounded-xl
+    bg-[#1C1E24]
+    border border-white/10
+    before:content-[''] before:absolute before:inset-0 before:rounded-[inherit]
+    before:pointer-events-none
+    before:transition-all before:duration-200 before:ease-[cubic-bezier(0.4,0,0.2,1)]
+
+    /* Brilho interno escuro permanente */
+    before:shadow-[inset_0_0_55px_22px_rgba(0,0,0,0.45),inset_0_0_110px_55px_rgba(0,0,0,0.32)]
+    before:opacity-65
+
+    hover:scale-[1.015]
+    hover:border-primary
+    hover:shadow-[0_0_35px_15px_rgba(0,0,0,0.55)]
+
+    hover:before:opacity-85
+    hover:before:shadow-[inset_0_0_75px_30px_rgba(0,,0,0.55),inset_0_0_150px_75px_rgba(0,0,0,0.40)]
+  ">
+
                                              <CardHeader className="pb-2 px-2.5 sm:px-4 md:px-6 pt-2.5 sm:pt-4 md:pt-6">
                                                   <div className="flex items-start justify-between gap-1.5 sm:gap-2">
                                                        <CardTitle className="text-sm sm:text-base md:text-lg line-clamp-2 flex-1 break-words pr-1">{note.title}</CardTitle>

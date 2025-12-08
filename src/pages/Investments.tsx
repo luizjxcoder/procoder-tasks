@@ -496,25 +496,39 @@ export default function Investments() {
                                                        key={investment.id}
                                                        className="px-3 py-2 hover:bg-muted/50 transition-colors border-l-4 border-l-primary"
                                                   >
-                                                       <div className="flex items-center justify-between gap-3">
-                                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                       <div className="flex items-center justify-between gap-2 sm:gap-3">
+                                                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                                                                  <div className="flex-1 min-w-0">
-                                                                      <div className="flex items-center gap-2">
-                                                                           <h3 className="font-semibold text-sm truncate">{investment.title}</h3>
-                                                                           {getStatusBadge(investment.status)}
+                                                                      {/* Mobile layout: title + category below */}
+                                                                      <div className="sm:hidden">
+                                                                           <div className="flex items-center gap-2">
+                                                                                <h3 className="font-semibold text-sm truncate">{investment.title}</h3>
+                                                                                {getStatusBadge(investment.status)}
+                                                                           </div>
+                                                                           <div className="mt-1">
+                                                                                {getCategoryBadge(investment.category)}
+                                                                           </div>
                                                                       </div>
-                                                                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                                                                           {investment.vendor && (
-                                                                                <span className="truncate max-w-[150px]">{investment.vendor}</span>
-                                                                           )}
-                                                                           <span>•</span>
-                                                                           <span>{new Date(investment.investment_date).toLocaleDateString("pt-BR")}</span>
-                                                                           <span>•</span>
-                                                                           {getCategoryBadge(investment.category)}
+
+                                                                      {/* Desktop layout: full info */}
+                                                                      <div className="hidden sm:block">
+                                                                           <div className="flex items-center gap-2">
+                                                                                <h3 className="font-semibold text-sm truncate">{investment.title}</h3>
+                                                                                {getStatusBadge(investment.status)}
+                                                                           </div>
+                                                                           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                                                                                {investment.vendor && (
+                                                                                     <span className="truncate max-w-[150px]">{investment.vendor}</span>
+                                                                                )}
+                                                                                {investment.vendor && <span>•</span>}
+                                                                                <span>{new Date(investment.investment_date).toLocaleDateString("pt-BR")}</span>
+                                                                                <span>•</span>
+                                                                                {getCategoryBadge(investment.category)}
+                                                                           </div>
                                                                       </div>
                                                                  </div>
 
-                                                                 <span className="text-lg font-bold text-primary whitespace-nowrap">
+                                                                 <span className="text-base sm:text-lg font-bold text-primary whitespace-nowrap">
                                                                       R$ {Number(investment.amount).toLocaleString("pt-BR", {
                                                                            minimumFractionDigits: 2,
                                                                       })}
