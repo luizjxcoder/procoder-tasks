@@ -17,6 +17,7 @@ import Sales from "./pages/Sales"
 import Investments from "./pages/Investments"
 import Customers from "./pages/Customers"
 import Auth from "./pages/Auth"
+import ResetPassword from "./pages/ResetPassword"
 import UserManagement from "./pages/UserManagement"
 import DesignBriefings from "./pages/DesignBriefings"
 import NotFound from "./pages/NotFound"
@@ -52,6 +53,7 @@ const App = () => (
                               <BrowserRouter basename={import.meta.env.DEV ? "/" : "/procoder-tasks"}>
                                    <Routes>
                                         <Route path="/auth" element={<Auth />} />
+                                        <Route path="/reset-password" element={<ResetPassword />} />
                                         <Route
                                              path="/"
                                              element={
