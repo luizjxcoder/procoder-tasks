@@ -111,14 +111,27 @@ export function BriefingDetailsModal({
           <Dialog open={open} onOpenChange={onOpenChange}>
                <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                         <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0">
-                              <div className="flex-1 min-w-0 w-full">
-                                   <DialogTitle className="text-xl sm:text-2xl break-words">{briefing.title}</DialogTitle>
-                                   <p className="text-muted-foreground mt-1 text-sm sm:text-base">{briefing.client_name}</p>
+                         <div className="relative">
+                              <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0">
+                                   <div className="flex-1 min-w-0 w-full">
+                                        <DialogTitle className="text-xl sm:text-2xl break-words">{briefing.title}</DialogTitle>
+                                        <p className="text-muted-foreground mt-1 text-sm sm:text-base">{briefing.client_name}</p>
+                                   </div>
+
+                                   {/* manter para fluxo quando for mobile */}
+                                   <div className="sm:hidden">
+                                        <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap self-start`}>
+                                             {getStatusLabel(briefing.status)}
+                                        </Badge>
+                                   </div>
                               </div>
-                              <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap self-start`}>
-                                   {getStatusLabel(briefing.status)}
-                              </Badge>
+
+                              {/* versão desktop posicionada de forma absoluta */}
+                              <div className="hidden sm:block absolute top-0 right-6">
+                                   <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap`}>
+                                        {getStatusLabel(briefing.status)}
+                                   </Badge>
+                              </div>
                          </div>
                     </DialogHeader>
 
@@ -322,15 +335,13 @@ export function BriefingDetailsModal({
 
                {/* Lightbox Dialog */}
                <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-                    <DialogContent className="max-w-screen max-h-screen w-screen h-screen p-0 bg-black/95 border-0 [&>button]:hidden">
+                    <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-black/95 border-0 [&>button]:!text-white [&>button]:bg-transparent [&>button]:active:bg-primary/20 [&>button]:hover:!text-primary [&>button]:top-4 [&>button]:right-4 [&>button]:rounded-full [&>button]:p-2 [&>button]:border-transparent [&>button]:hover:border-primary [&>button]:active:border-primary [&>button]:transition-all">
                          <div className="relative w-full h-full flex items-center justify-center">
                               <Button
                                    variant="ghost"
                                    size="icon"
-                                   onClick={() => setLightboxOpen(false)}
-                                   className="absolute top-4 right-4 z-50 text-white hover:bg-orange-500/20 hover:text-orange-500 transition-colors"
-                              >
-                                   <X className="w-6 h-6" />
+                                   onClick={() => setLightboxOpen(false)}>
+
                               </Button>
 
                               {logoUrls.length > 1 && (
