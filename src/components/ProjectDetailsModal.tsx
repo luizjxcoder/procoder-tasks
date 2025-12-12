@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Flag, DollarSign, Calendar as CalendarIcon, Clock, Target, Maximize2, X } from "lucide-react"
+import { Calendar, Users, Flag, DollarSign, Calendar as CalendarIcon, Clock, Target, Maximize2 } from "lucide-react"
 import { format } from "date-fns"
 
 interface Project {
@@ -217,15 +217,8 @@ export function ProjectDetailsModal({ project, open, onOpenChange }: ProjectDeta
                {/* Fullscreen Image Modal */}
                {imageFullscreen && project.image_url && (
                     <Dialog open={imageFullscreen} onOpenChange={setImageFullscreen}>
-                         <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-black/95 border-0">
-                              <Button
-                                   variant="ghost"
-                                   size="icon"
-                                   className="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 text-white"
-                                   onClick={() => setImageFullscreen(false)}
-                              >
-                                   <X className="w-6 h-6" />
-                              </Button>
+                         <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-black/95 border-0 [&>button]:!text-white [&>button]:bg-transparent [&>button]:active:bg-primary/20 [&>button]:hover:!text-primary [&>button]:top-4 [&>button]:right-4 [&>button]:rounded-full [&>button]:p-2 [&>button]:border-transparent [&>button]:hover:border-primary [&>button]:active:border-primary [&>button]:transition-all">
+
                               <div className="w-full h-full flex items-center justify-center p-4">
                                    <img
                                         src={project.image_url}
