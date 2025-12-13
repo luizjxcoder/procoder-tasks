@@ -24,6 +24,7 @@ interface Briefing {
      brand_assets: any[]
      status: string
      created_at: string
+     updated_at: string
 }
 
 interface BriefingDetailsModalProps {
@@ -326,6 +327,12 @@ export function BriefingDetailsModal({
                                         <p className="text-muted-foreground">Criado em</p>
                                         <p className="font-medium">
                                              {new Date(briefing.created_at).toLocaleDateString('pt-BR')}
+                                        </p>
+                                   </div>
+                                   <div>
+                                        <p className="text-muted-foreground">Atualizado em</p>
+                                        <p className="font-medium">
+                                             {new Date(briefing.updated_at).toLocaleDateString('pt-BR')}
                                         </p>
                                    </div>
                               </div>
