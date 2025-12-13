@@ -1,6 +1,6 @@
-# Sistema de Administração - Procoder Tasks
+# Sistema de Administração - CODERTASKS
 
-Este documento explica como configurar e usar o sistema de administração do Procoder Tasks.
+Este documento explica como configurar e usar o sistema de administração do CODERTASKS.
 
 ## Configuração Inicial
 
