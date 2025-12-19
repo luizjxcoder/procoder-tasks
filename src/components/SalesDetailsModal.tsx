@@ -185,7 +185,7 @@ export function SalesDetailsModal({
 
   const renderStarRating = (value?: number, onChange?: (value: number) => void) => {
     if (!isEditing && !value) return null;
-    
+
     return (
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
@@ -200,11 +200,10 @@ export function SalesDetailsModal({
             )}
           >
             <Star
-              className={`h-5 w-5 transition-colors ${
-                star <= (value || 0)
+              className={`h-5 w-5 transition-colors ${star <= (value || 0)
                   ? "fill-yellow-400 text-yellow-400"
                   : "text-gray-300"
-              } ${isEditing && star > (value || 0) && "hover:text-yellow-200"}`}
+                } ${isEditing && star > (value || 0) && "hover:text-yellow-200"}`}
             />
           </button>
         ))}
@@ -232,6 +231,7 @@ export function SalesDetailsModal({
             <Button
               variant="ghost"
               size="sm"
+              className="mr-[15px]"
               onClick={() => {
                 if (isEditing) {
                   setIsEditing(false);

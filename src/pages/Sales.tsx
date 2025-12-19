@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, Star, DollarSign, TrendingUp, Users, Calendar, FileDown, BarChart3, Eye, Edit } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus, Search, Filter, Star, DollarSign, TrendingUp, Users, Calendar, FileDown, BarChart3, Eye, Edit, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TaskManagerSidebar } from "@/components/TaskManagerSidebar";
 import { SalesForm } from "@/components/SalesForm";
@@ -19,6 +19,17 @@ import {
      DropdownMenuItem,
      DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import {
+     AlertDialog,
+     AlertDialogAction,
+     AlertDialogCancel,
+     AlertDialogContent,
+     AlertDialogDescription,
+     AlertDialogFooter,
+     AlertDialogHeader,
+     AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Sale {
      id: string;
@@ -50,6 +61,8 @@ export default function Sales() {
           { label: "Clientes", value: "0", icon: Users, color: "text-info" },
           { label: "Este Mês", value: "0", icon: Calendar, color: "text-warning" }
      ]);
+
+     const [saleToDelete, setSaleToDelete] = useState<string | null>(null);
 
      useEffect(() => {
           if (user) {
@@ -129,6 +142,7 @@ export default function Sales() {
                if (error) throw error;
 
                setSales(sales.filter(sale => sale.id !== saleId));
+               setSaleToDelete(null);
                toast({
                     title: "Sucesso",
                     description: "Venda excluída com sucesso",
@@ -141,6 +155,10 @@ export default function Sales() {
                     variant: "destructive",
                });
           }
+     };
+
+     const confirmDeleteSale = (saleId: string) => {
+          setSaleToDelete(saleId);
      };
 
      const getPaymentStatusBadge = (status: string) => {
@@ -160,8 +178,8 @@ export default function Sales() {
                          <Star
                               key={star}
                               className={`h-4 w-4 ${star <= rating
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "text-gray-300"
+                                   ? "fill-yellow-400 text-yellow-400"
+                                   : "text-gray-300"
                                    }`}
                          />
                     ))}
@@ -328,29 +346,28 @@ export default function Sales() {
                                                             >
                                                                  <Eye className="w-4 h-4" />
                                                             </Button>
-                                                            <DropdownMenu>
-                                                                 <DropdownMenuTrigger asChild>
-                                                                      <Button
-                                                                           variant="ghost"
-                                                                           size="sm"
-                                                                           onClick={(e) => e.stopPropagation()}
-                                                                           className="px-2"
-                                                                      >
-                                                                           <Edit className="w-4 h-4" />
-                                                                      </Button>
-                                                                 </DropdownMenuTrigger>
-                                                                 <DropdownMenuContent align="end">
-                                                                      <DropdownMenuItem onClick={() => handleEditSale(sale)}>
-                                                                           Editar
-                                                                      </DropdownMenuItem>
-                                                                      <DropdownMenuItem
-                                                                           onClick={() => handleDeleteSale(sale.id)}
-                                                                           className="text-destructive"
-                                                                      >
-                                                                           Excluir
-                                                                      </DropdownMenuItem>
-                                                                 </DropdownMenuContent>
-                                                            </DropdownMenu>
+                                                            <Button
+                                                                 variant="ghost"
+                                                                 size="sm"
+                                                                 onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      handleEditSale(sale);
+                                                                 }}
+                                                                 className="px-2"
+                                                            >
+                                                                 <Edit className="w-4 h-4" />
+                                                            </Button>
+                                                            <Button
+                                                                 variant="ghost"
+                                                                 size="sm"
+                                                                 onClick={(e) => {
+                                                                      e.stopPropagation();
+                                                                      confirmDeleteSale(sale.id);
+                                                                 }}
+                                                                 className="px-2 text-destructive hover:text-destructive"
+                                                            >
+                                                                 <Trash2 className="w-4 h-4" />
+                                                            </Button>
                                                        </div>
                                                   </CardContent>
                                              </Card>
@@ -391,8 +408,28 @@ export default function Sales() {
                                    open={showDetails}
                                    onOpenChange={setShowDetails}
                                    onSaleUpdated={handleSaleUpdated}
-                                   onSaleDeleted={handleDeleteSale}
+                                   onSaleDeleted={confirmDeleteSale}
                               />
+
+                              <AlertDialog open={!!saleToDelete} onOpenChange={(open) => !open && setSaleToDelete(null)}>
+                                   <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                             <AlertDialogDescription>
+                                                  Tem certeza que deseja excluir esta venda? Esta operação é irreversível e todos os dados associados serão permanentemente removidos.
+                                             </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                             <AlertDialogAction
+                                                  onClick={() => saleToDelete && handleDeleteSale(saleToDelete)}
+                                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                             >
+                                                  Excluir
+                                             </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                   </AlertDialogContent>
+                              </AlertDialog>
                          </main>
                     </div>
                </SidebarProvider>

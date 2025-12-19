@@ -11,7 +11,8 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, BookOpen, Star, StarOff, Edit, Trash2, Search, Tag, Eye, LayoutGrid, List } from "lucide-react"
+import { Plus, BookOpen, Star, StarOff, Edit, Trash2, Search, Tag, Eye, LayoutGrid, List, MoreVertical } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import { NoteDetailsModal } from "@/components/NoteDetailsModal"
 
@@ -431,46 +432,87 @@ export default function Notes() {
                                                   <div className="flex items-start justify-between gap-1.5 sm:gap-2">
                                                        <CardTitle className="text-sm sm:text-base md:text-lg line-clamp-2 flex-1 break-words pr-1">{note.title}</CardTitle>
                                                        <div className="flex gap-0 sm:gap-0.5 flex-shrink-0">
-                                                            <Button
-                                                                 variant="ghost"
-                                                                 size="sm"
-                                                                 onClick={() => handleViewDetails(note)}
-                                                                 title="Visualizar"
-                                                                 className="h-6 w-6 sm:h-7 sm:w-7 p-0"
-                                                            >
-                                                                 <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                                                            </Button>
-                                                            <Button
-                                                                 variant="ghost"
-                                                                 size="sm"
-                                                                 onClick={() => toggleFavorite(note)}
-                                                                 title={note.is_favorite ? "Remover favorito" : "Adicionar favorito"}
-                                                                 className="h-6 w-6 sm:h-7 sm:w-7 p-0"
-                                                            >
-                                                                 {note.is_favorite ? (
-                                                                      <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-yellow-500 fill-current" />
-                                                                 ) : (
-                                                                      <StarOff className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
-                                                                 )}
-                                                            </Button>
-                                                            <Button
-                                                                 variant="ghost"
-                                                                 size="sm"
-                                                                 onClick={() => openEditDialog(note)}
-                                                                 title="Editar"
-                                                                 className="h-6 w-6 sm:h-7 sm:w-7 p-0"
-                                                            >
-                                                                 <Edit className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                                                            </Button>
-                                                            <Button
-                                                                 variant="ghost"
-                                                                 size="sm"
-                                                                 onClick={() => openDeleteDialog(note.id)}
-                                                                 title="Excluir"
-                                                                 className="h-6 w-6 sm:h-7 sm:w-7 p-0"
-                                                            >
-                                                                 <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-destructive" />
-                                                            </Button>
+                                                            {/* Mobile: 3-dot menu */}
+                                                            <div className="sm:hidden flex items-center gap-0.5">
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => toggleFavorite(note)}
+                                                                      title={note.is_favorite ? "Remover favorito" : "Adicionar favorito"}
+                                                                      className="h-6 w-6 p-0"
+                                                                 >
+                                                                      {note.is_favorite ? (
+                                                                           <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                                                                      ) : (
+                                                                           <StarOff className="w-3 h-3 text-muted-foreground" />
+                                                                      )}
+                                                                 </Button>
+                                                                 <DropdownMenu>
+                                                                      <DropdownMenuTrigger asChild>
+                                                                           <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                                                <MoreVertical className="w-3.5 h-3.5" />
+                                                                           </Button>
+                                                                      </DropdownMenuTrigger>
+                                                                      <DropdownMenuContent align="end" className="bg-popover z-50">
+                                                                           <DropdownMenuItem onClick={() => handleViewDetails(note)}>
+                                                                                <Eye className="w-4 h-4 mr-2" />
+                                                                                Visualizar
+                                                                           </DropdownMenuItem>
+                                                                           <DropdownMenuItem onClick={() => openEditDialog(note)}>
+                                                                                <Edit className="w-4 h-4 mr-2" />
+                                                                                Editar
+                                                                           </DropdownMenuItem>
+                                                                           <DropdownMenuItem onClick={() => openDeleteDialog(note.id)} className="text-destructive focus:text-destructive">
+                                                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                                                Excluir
+                                                                           </DropdownMenuItem>
+                                                                      </DropdownMenuContent>
+                                                                 </DropdownMenu>
+                                                            </div>
+
+                                                            {/* Desktop: individual icons */}
+                                                            <div className="hidden sm:flex gap-0.5">
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => handleViewDetails(note)}
+                                                                      title="Visualizar"
+                                                                      className="h-7 w-7 p-0"
+                                                                 >
+                                                                      <Eye className="w-3.5 h-3.5" />
+                                                                 </Button>
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => toggleFavorite(note)}
+                                                                      title={note.is_favorite ? "Remover favorito" : "Adicionar favorito"}
+                                                                      className="h-7 w-7 p-0"
+                                                                 >
+                                                                      {note.is_favorite ? (
+                                                                           <Star className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+                                                                      ) : (
+                                                                           <StarOff className="w-3.5 h-3.5 text-muted-foreground" />
+                                                                      )}
+                                                                 </Button>
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => openEditDialog(note)}
+                                                                      title="Editar"
+                                                                      className="h-7 w-7 p-0"
+                                                                 >
+                                                                      <Edit className="w-3.5 h-3.5" />
+                                                                 </Button>
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => openDeleteDialog(note.id)}
+                                                                      title="Excluir"
+                                                                      className="h-7 w-7 p-0"
+                                                                 >
+                                                                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                                                                 </Button>
+                                                            </div>
                                                        </div>
                                                   </div>
                                              </CardHeader>
@@ -514,10 +556,11 @@ export default function Notes() {
                                         {filteredNotes.map((note) => (
                                              <div
                                                   key={note.id}
-                                                  className="p-4 hover:bg-muted/50 transition-colors"
+                                                  className="p-3 sm:p-4 hover:bg-muted/50 transition-colors"
                                              >
-                                                  <div className="flex items-center justify-between gap-4">
-                                                       <div className="flex items-start gap-3 flex-1 min-w-0">
+                                                  <div className="flex items-center justify-between gap-2 sm:gap-4">
+                                                       {/* Desktop: favorite icon on left */}
+                                                       <div className="hidden sm:block">
                                                             <Button
                                                                  variant="ghost"
                                                                  size="sm"
@@ -532,74 +575,130 @@ export default function Notes() {
                                                                  )}
                                                             </Button>
 
-                                                            <div className="flex-1 min-w-0">
-                                                                 <h3 className="font-semibold text-sm sm:text-base break-words line-clamp-1 text-foreground mb-1">
-                                                                      {note.title}
-                                                                 </h3>
+                                                       </div>
 
-                                                                 {note.content && (
-                                                                      <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-2 break-words">
-                                                                           {note.content}
-                                                                      </p>
+                                                       <div className="flex-1 min-w-0">
+                                                            {/* Mobile: truncated to 35 chars */}
+                                                            <h3 className="font-semibold text-sm sm:text-base text-foreground mb-1">
+                                                                 <span className="sm:hidden">
+                                                                      {note.title.length > 35 ? `${note.title.substring(0, 35)}...` : note.title}
+                                                                 </span>
+                                                                 <span className="hidden sm:inline">
+                                                                      {note.title.length > 85 ? `${note.title.substring(0, 85)}...` : note.title}
+                                                                 </span>
+                                                            </h3>
+
+                                                            {note.content && (
+                                                                 <p className="text-muted-foreground text-xs sm:text-sm mb-2">
+                                                                      <span className="sm:hidden">
+                                                                           {note.content.length > 35 ? `${note.content.substring(0, 35)}...` : note.content}
+                                                                      </span>
+                                                                      <span className="hidden sm:inline">
+                                                                           {note.content.length > 85 ? `${note.content.substring(0, 85)}...` : note.content}
+                                                                      </span>
+                                                                 </p>
+                                                            )}
+                                                            <div className="hidden sm:flex flex-wrap items-center gap-2">
+                                                                 {note.tags && note.tags.length > 0 && (
+                                                                      <div className="flex flex-wrap gap-1">
+                                                                           {note.tags.slice(0, 3).map((tag) => (
+                                                                                <Badge key={tag} variant="secondary" className="text-[10px] sm:text-xs px-1.5 py-0">
+                                                                                     {tag}
+                                                                                </Badge>
+                                                                           ))}
+                                                                           {note.tags.length > 3 && (
+                                                                                <Badge variant="secondary" className="text-[10px] sm:text-xs px-1.5 py-0">
+                                                                                     +{note.tags.length - 3}
+                                                                                </Badge>
+                                                                           )}
+                                                                      </div>
                                                                  )}
 
-                                                                 <div className="flex flex-wrap items-center gap-2">
-                                                                      {note.tags && note.tags.length > 0 && (
-                                                                           <div className="flex flex-wrap gap-1">
-                                                                                {note.tags.slice(0, 3).map((tag) => (
-                                                                                     <Badge key={tag} variant="secondary" className="text-[10px] sm:text-xs px-1.5 py-0">
-                                                                                          {tag}
-                                                                                     </Badge>
-                                                                                ))}
-                                                                                {note.tags.length > 3 && (
-                                                                                     <Badge variant="secondary" className="text-[10px] sm:text-xs px-1.5 py-0">
-                                                                                          +{note.tags.length - 3}
-                                                                                     </Badge>
-                                                                                )}
-                                                                           </div>
-                                                                      )}
-
-                                                                      <span className="text-[10px] sm:text-xs text-muted-foreground">
-                                                                           {new Date(note.updated_at).toLocaleDateString('pt-BR', {
-                                                                                day: '2-digit',
-                                                                                month: '2-digit',
-                                                                                year: '2-digit',
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit'
-                                                                           })}
-                                                                      </span>
-                                                                 </div>
+                                                                 <span className="text-[10px] sm:text-xs text-muted-foreground">
+                                                                      {new Date(note.updated_at).toLocaleDateString('pt-BR', {
+                                                                           day: '2-digit',
+                                                                           month: '2-digit',
+                                                                           year: '2-digit',
+                                                                           hour: '2-digit',
+                                                                           minute: '2-digit'
+                                                                      })}
+                                                                 </span>
                                                             </div>
                                                        </div>
 
+                                                       {/* Mobile: favorite icon on right + 3-dot menu */}
+                                                       <div className="flex items-center gap-1 sm:hidden flex-shrink-0">
+                                                            <Button
+                                                                 variant="ghost"
+                                                                 size="sm"
+                                                                 onClick={() => toggleFavorite(note)}
+                                                                 title={note.is_favorite ? "Remover favorito" : "Adicionar favorito"}
+                                                                 className="h-8 w-8 p-0"
+                                                            >
+                                                                 {note.is_favorite ? (
+                                                                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                                                                 ) : (
+                                                                      <StarOff className="w-4 h-4 text-muted-foreground" />
+                                                                 )}
+                                                            </Button>
+                                                       </div>
+
                                                        <div className="flex items-center gap-1 flex-shrink-0">
-                                                            <Button
-                                                                 variant="ghost"
-                                                                 size="sm"
-                                                                 onClick={() => handleViewDetails(note)}
-                                                                 title="Visualizar detalhes"
-                                                            >
-                                                                 <Eye className="w-4 h-4" />
-                                                            </Button>
+                                                            {/* Mobile: 3-dot menu */}
+                                                            <div className="sm:hidden">
+                                                                 <DropdownMenu>
+                                                                      <DropdownMenuTrigger asChild>
+                                                                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                                                <MoreVertical className="w-4 h-4" />
+                                                                           </Button>
+                                                                      </DropdownMenuTrigger>
+                                                                      <DropdownMenuContent align="end" className="bg-popover z-50">
+                                                                           <DropdownMenuItem onClick={() => handleViewDetails(note)}>
+                                                                                <Eye className="w-4 h-4 mr-2" />
+                                                                                Visualizar
+                                                                           </DropdownMenuItem>
+                                                                           <DropdownMenuItem onClick={() => openEditDialog(note)}>
+                                                                                <Edit className="w-4 h-4 mr-2" />
+                                                                                Editar
+                                                                           </DropdownMenuItem>
+                                                                           <DropdownMenuItem onClick={() => openDeleteDialog(note.id)} className="text-destructive focus:text-destructive">
+                                                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                                                Excluir
+                                                                           </DropdownMenuItem>
+                                                                      </DropdownMenuContent>
+                                                                 </DropdownMenu>
+                                                            </div>
 
-                                                            <Button
-                                                                 variant="ghost"
-                                                                 size="sm"
-                                                                 onClick={() => openEditDialog(note)}
-                                                                 title="Editar"
-                                                            >
-                                                                 <Edit className="w-4 h-4" />
-                                                            </Button>
+                                                            {/* Desktop: individual icons */}
+                                                            <div className="hidden sm:flex items-center gap-1">
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => handleViewDetails(note)}
+                                                                      title="Visualizar detalhes"
+                                                                 >
+                                                                      <Eye className="w-4 h-4" />
+                                                                 </Button>
 
-                                                            <Button
-                                                                 variant="ghost"
-                                                                 size="sm"
-                                                                 onClick={() => openDeleteDialog(note.id)}
-                                                                 title="Excluir"
-                                                                 className="text-destructive hover:text-destructive"
-                                                            >
-                                                                 <Trash2 className="w-4 h-4" />
-                                                            </Button>
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => openEditDialog(note)}
+                                                                      title="Editar"
+                                                                 >
+                                                                      <Edit className="w-4 h-4" />
+                                                                 </Button>
+
+                                                                 <Button
+                                                                      variant="ghost"
+                                                                      size="sm"
+                                                                      onClick={() => openDeleteDialog(note.id)}
+                                                                      title="Excluir"
+                                                                      className="text-destructive hover:text-destructive"
+                                                                 >
+                                                                      <Trash2 className="w-4 h-4" />
+                                                                 </Button>
+                                                            </div>
                                                        </div>
                                                   </div>
                                              </div>

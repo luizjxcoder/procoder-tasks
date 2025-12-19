@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Plus, Edit2, Trash2, Calendar, Clock, Flag, CheckSquare, Eye, LayoutGrid, List, Columns3 } from "lucide-react"
+import { Plus, Edit2, Trash2, Calendar, Clock, Flag, CheckSquare, Eye, LayoutGrid, List, Columns3, MoreVertical } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
@@ -29,6 +29,13 @@ import {
      AlertDialogHeader,
      AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+
+import {
+     DropdownMenu,
+     DropdownMenuContent,
+     DropdownMenuItem,
+     DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface Task {
      id: string
@@ -758,8 +765,9 @@ export default function Tasks() {
                                                                                 task.status === 'in-progress' ? 'Em progresso' : 'Concluída'}
                                                                       </Badge>
 
+                                                                      {/* Desktop: Individual icons */}
                                                                       <TooltipProvider>
-                                                                           <div className="flex items-center gap-1">
+                                                                           <div className="hidden sm:flex items-center gap-1">
                                                                                 <Tooltip>
                                                                                      <TooltipTrigger asChild>
                                                                                           <Button
@@ -809,6 +817,33 @@ export default function Tasks() {
                                                                                 </Tooltip>
                                                                            </div>
                                                                       </TooltipProvider>
+                                                                      {/* Mobile: Dropdown menu */}
+                                                                      <div className="sm:hidden">
+                                                                           <DropdownMenu>
+                                                                                <DropdownMenuTrigger asChild>
+                                                                                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                                                          <MoreVertical className="w-4 h-4 text-foreground" />
+                                                                                     </Button>
+                                                                                </DropdownMenuTrigger>
+                                                                                <DropdownMenuContent align="end">
+                                                                                     <DropdownMenuItem onClick={() => handleViewDetails(task)}>
+                                                                                          <Eye className="w-4 h-4 mr-2" />
+                                                                                          Visualizar
+                                                                                     </DropdownMenuItem>
+                                                                                     <DropdownMenuItem onClick={() => openEditDialog(task)}>
+                                                                                          <Edit2 className="w-4 h-4 mr-2" />
+                                                                                          Editar
+                                                                                     </DropdownMenuItem>
+                                                                                     <DropdownMenuItem
+                                                                                          onClick={() => handleDeleteClick(task)}
+                                                                                          className="text-destructive focus:text-destructive"
+                                                                                     >
+                                                                                          <Trash2 className="w-4 h-4 mr-2" />
+                                                                                          Excluir
+                                                                                     </DropdownMenuItem>
+                                                                                </DropdownMenuContent>
+                                                                           </DropdownMenu>
+                                                                      </div>
                                                                  </div>
                                                             </div>
                                                        </CardContent>
@@ -879,8 +914,9 @@ export default function Tasks() {
                                                                                      task.status === 'in-progress' ? 'Em progresso' : 'Concluída'}
                                                                            </Badge>
 
+                                                                           {/* Desktop: Individual icons */}
                                                                            <TooltipProvider>
-                                                                                <div className="flex items-center gap-1">
+                                                                                <div className="hidden sm:flex items-center gap-1">
                                                                                      <Tooltip>
                                                                                           <TooltipTrigger asChild>
                                                                                                <Button
@@ -930,6 +966,33 @@ export default function Tasks() {
                                                                                      </Tooltip>
                                                                                 </div>
                                                                            </TooltipProvider>
+                                                                           {/* Mobile: Dropdown menu */}
+                                                                           <div className="sm:hidden">
+                                                                                <DropdownMenu>
+                                                                                     <DropdownMenuTrigger asChild>
+                                                                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                                                               <MoreVertical className="w-4 h-4 text-foreground" />
+                                                                                          </Button>
+                                                                                     </DropdownMenuTrigger>
+                                                                                     <DropdownMenuContent align="end">
+                                                                                          <DropdownMenuItem onClick={() => handleViewDetails(task)}>
+                                                                                               <Eye className="w-4 h-4 mr-2" />
+                                                                                               Visualizar
+                                                                                          </DropdownMenuItem>
+                                                                                          <DropdownMenuItem onClick={() => openEditDialog(task)}>
+                                                                                               <Edit2 className="w-4 h-4 mr-2" />
+                                                                                               Editar
+                                                                                          </DropdownMenuItem>
+                                                                                          <DropdownMenuItem
+                                                                                               onClick={() => handleDeleteClick(task)}
+                                                                                               className="text-destructive focus:text-destructive"
+                                                                                          >
+                                                                                               <Trash2 className="w-4 h-4 mr-2" />
+                                                                                               Excluir
+                                                                                          </DropdownMenuItem>
+                                                                                     </DropdownMenuContent>
+                                                                                </DropdownMenu>
+                                                                           </div>
                                                                       </div>
                                                                  </div>
                                                             </div>

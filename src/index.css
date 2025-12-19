@@ -5,226 +5,204 @@
 /* Task Manager Design System - Dark Professional Theme */
 
 @layer base {
-        :root {
-                /* Dark theme colors - HSL format */
-                --background: 220 13% 8%;
-                --foreground: 210 11% 85%;
+  :root {
+    /* Dark theme colors - HSL format */
+    --background: 220 13% 8%;
+    --foreground: 210 11% 85%;
 
-                --card: 220 13% 11%;
-                --card-foreground: 210 11% 85%;
+    --card: 220 13% 11%;
+    --card-foreground: 210 11% 85%;
 
-                --popover: 220 13% 11%;
-                --popover-foreground: 210 11% 85%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 210 11% 85%;
 
-                --secondary: 220 13% 14%;
-                --secondary-foreground: 210 11% 85%;
+    --secondary: 220 13% 14%;
+    --secondary-foreground: 210 11% 85%;
 
-                --muted: 220 13% 14%;
-                --muted-foreground: 215 16% 50%;
+    --muted: 220 13% 14%;
+    --muted-foreground: 215 16% 50%;
 
-                --destructive: 0 84% 60%;
-                --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
 
-                --border: 220 13% 18%;
-                --input: 220 13% 14%;
+    --border: 220 13% 18%;
+    --input: 220 13% 14%;
 
-                --radius: 0.75rem;
+    --radius: 0.75rem;
 
-                /* Sidebar colors */
-                --sidebar-background: 220 13% 8%;
-                --sidebar-foreground: 210 11% 85%;
-                --sidebar-accent: 220 13% 14%;
-                --sidebar-accent-foreground: 210 11% 85%;
-                --sidebar-border: 220 13% 18%;
+    /* Sidebar colors */
+    --sidebar-background: 220 13% 8%;
+    --sidebar-foreground: 210 11% 85%;
+    --sidebar-accent: 220 13% 14%;
+    --sidebar-accent-foreground: 210 11% 85%;
+    --sidebar-border: 220 13% 18%;
 
-                /* Custom design tokens */
-                --success: 142 71% 45%;
-                --warning: 38 92% 50%;
-                --info: 217 91% 60%;
+    /* Custom design tokens */
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --info: 217 91% 60%;
+    
+    /* Project priority colors */
+    --priority-high: 0 84% 60%;
+    --priority-medium: 38 92% 50%;
+    --priority-low: 142 71% 45%;
 
-                /* Project priority colors */
-                --priority-high: 0 84% 60%;
-                --priority-medium: 38 92% 50%;
-                --priority-low: 142 71% 45%;
+    /* Gradients */
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 13% 12%));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-background)), hsl(220 13% 6%));
 
-                /* Gradients */
-                --gradient-card: linear-gradient(
-                        145deg,
-                        hsl(var(--card)),
-                        hsl(220 13% 12%)
-                );
-                --gradient-sidebar: linear-gradient(
-                        180deg,
-                        hsl(var(--sidebar-background)),
-                        hsl(220 13% 6%)
-                );
+    /* Shadows */
+    --shadow-card: 0 4px 20px -2px hsl(220 13% 4% / 0.3);
+    --shadow-hover: 0 8px 30px -4px hsl(220 13% 4% / 0.4);
 
-                /* Shadows */
-                --shadow-card: 0 4px 20px -2px hsl(220 13% 4% / 0.3);
-                --shadow-hover: 0 8px 30px -4px hsl(220 13% 4% / 0.4);
+    /* Animation timing */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
 
-                /* Animation timing */
-                --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                --transition-bounce: all 0.3s
-                        cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
+  /* Default Theme (Orange) */
+  .theme-default {
+    --primary: 16 100% 66%;
+    --primary-foreground: 220 13% 8%;
+    --primary-rgb: 255, 122, 82;
+    --accent: 16 100% 66%;
+    --accent-foreground: 220 13% 8%;
+    --ring: 16 100% 66%;
+    --sidebar-primary: 16 100% 66%;
+    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-ring: 16 100% 66%;
+    --gradient-primary: linear-gradient(135deg, hsl(16 100% 66%), hsl(16 100% 56%));
+    --shadow-primary: 0 4px 20px -2px hsl(16 100% 66% / 0.2);
+  }
 
-        /* Default Theme (Orange) */
-        .theme-default {
-                --primary: 16 100% 66%;
-                --primary-foreground: 220 13% 8%;
-                --accent: 16 100% 66%;
-                --accent-foreground: 220 13% 8%;
-                --ring: 16 100% 66%;
-                --sidebar-primary: 16 100% 66%;
-                --sidebar-primary-foreground: 220 13% 8%;
-                --sidebar-ring: 16 100% 66%;
-                --gradient-primary: linear-gradient(
-                        135deg,
-                        hsl(16 100% 66%),
-                        hsl(16 100% 56%)
-                );
-                --shadow-primary: 0 4px 20px -2px hsl(16 100% 66% / 0.2);
-        }
+  /* Green Theme */
+  .theme-green {
+    --primary: 160 78% 41%;
+    --primary-foreground: 220 13% 8%;
+    --primary-rgb: 23, 186, 139;
+    --accent: 160 78% 41%;
+    --accent-foreground: 220 13% 8%;
+    --ring: 160 78% 41%;
+    --sidebar-primary: 160 78% 41%;
+    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-ring: 160 78% 41%;
+    --gradient-primary: linear-gradient(135deg, hsl(160 78% 41%), hsl(160 78% 31%));
+    --shadow-primary: 0 4px 20px -2px hsl(160 78% 41% / 0.2);
+  }
 
-        /* Green Theme */
-        .theme-green {
-                --primary: 160 78% 41%;
-                --primary-foreground: 220 13% 8%;
-                --accent: 160 78% 41%;
-                --accent-foreground: 220 13% 8%;
-                --ring: 160 78% 41%;
-                --sidebar-primary: 160 78% 41%;
-                --sidebar-primary-foreground: 220 13% 8%;
-                --sidebar-ring: 160 78% 41%;
-                --gradient-primary: linear-gradient(
-                        135deg,
-                        hsl(160 78% 41%),
-                        hsl(160 78% 31%)
-                );
-                --shadow-primary: 0 4px 20px -2px hsl(160 78% 41% / 0.2);
-        }
+  /* Blue Theme */
+  .theme-blue {
+    --primary: 195 100% 50%;
+    --primary-foreground: 220 13% 8%;
+    --primary-rgb: 0, 191, 255;
+    --accent: 195 100% 50%;
+    --accent-foreground: 220 13% 8%;
+    --ring: 195 100% 50%;
+    --sidebar-primary: 195 100% 50%;
+    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-ring: 195 100% 50%;
+    --gradient-primary: linear-gradient(135deg, hsl(195 100% 50%), hsl(195 100% 40%));
+    --shadow-primary: 0 4px 20px -2px hsl(195 100% 50% / 0.2);
+  }
 
-        /* Blue Theme */
-        .theme-blue {
-                --primary: 195 100% 50%;
-                --primary-foreground: 220 13% 8%;
-                --accent: 195 100% 50%;
-                --accent-foreground: 220 13% 8%;
-                --ring: 195 100% 50%;
-                --sidebar-primary: 195 100% 50%;
-                --sidebar-primary-foreground: 220 13% 8%;
-                --sidebar-ring: 195 100% 50%;
-                --gradient-primary: linear-gradient(
-                        135deg,
-                        hsl(195 100% 50%),
-                        hsl(195 100% 40%)
-                );
-                --shadow-primary: 0 4px 20px -2px hsl(195 100% 50% / 0.2);
-        }
-
-        /* Purple Theme */
-        .theme-purple {
-                --primary: 262 83% 58%;
-                --primary-foreground: 220 13% 8%;
-                --accent: 262 83% 58%;
-                --accent-foreground: 220 13% 8%;
-                --ring: 262 83% 58%;
-                --sidebar-primary: 262 83% 58%;
-                --sidebar-primary-foreground: 220 13% 8%;
-                --sidebar-ring: 262 83% 58%;
-                --gradient-primary: linear-gradient(
-                        135deg,
-                        hsl(262 83% 58%),
-                        hsl(262 83% 48%)
-                );
-                --shadow-primary: 0 4px 20px -2px hsl(262 83% 58% / 0.2);
-        }
+  /* Purple Theme */
+  .theme-purple {
+    --primary: 262 83% 58%;
+    --primary-foreground: 220 13% 8%;
+    --primary-rgb: 139, 92, 246;
+    --accent: 262 83% 58%;
+    --accent-foreground: 220 13% 8%;
+    --ring: 262 83% 58%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-ring: 262 83% 58%;
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 83% 48%));
+    --shadow-primary: 0 4px 20px -2px hsl(262 83% 58% / 0.2);
+  }
 }
 
 @layer base {
-        * {
-                @apply border-border;
-        }
+  * {
+    @apply border-border;
+  }
 
-        body {
-                @apply bg-background text-foreground;
-        }
+  body {
+    @apply bg-background text-foreground;
+  }
 
-        /* Custom Scrollbar Styling */
-        ::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-        }
+  /* Custom Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
 
-        ::-webkit-scrollbar-track {
-                background: hsl(var(--background));
-                border-radius: 4px;
-        }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+    border-radius: 4px;
+  }
 
-        ::-webkit-scrollbar-thumb {
-                background: hsl(var(--primary) / 0.6);
-                border-radius: 4px;
-                border: 1px solid hsl(var(--background));
-        }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.6);
+    border-radius: 4px;
+    border: 1px solid hsl(var(--background));
+  }
 
-        ::-webkit-scrollbar-thumb:hover {
-                background: hsl(var(--primary) / 0.8);
-        }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.8);
+  }
 
-        ::-webkit-scrollbar-thumb:active {
-                background: hsl(var(--primary));
-        }
+  ::-webkit-scrollbar-thumb:active {
+    background: hsl(var(--primary));
+  }
 
-        ::-webkit-scrollbar-corner {
-                background: hsl(var(--background));
-        }
+  ::-webkit-scrollbar-corner {
+    background: hsl(var(--background));
+  }
 
-        /* Firefox scrollbar */
-        * {
-                scrollbar-width: thin;
-                scrollbar-color: hsl(var(--primary) / 0.6)
-                        hsl(var(--background));
-        }
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.6) hsl(var(--background));
+  }
 
-        /* Dark mode scrollbar for better contrast */
-        .dark ::-webkit-scrollbar-thumb {
-                background: hsl(var(--primary) / 0.7);
-        }
+  /* Dark mode scrollbar for better contrast */
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.7);
+  }
 
-        .dark ::-webkit-scrollbar-thumb:hover {
-                background: hsl(var(--primary) / 0.9);
-        }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.9);
+  }
 
-        /* Specific scrollbar for sidebar */
-        .sidebar-scroll::-webkit-scrollbar {
-                width: 6px;
-        }
+  /* Specific scrollbar for sidebar */
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
 
-        .sidebar-scroll::-webkit-scrollbar-thumb {
-                background: hsl(var(--sidebar-accent));
-                border-radius: 3px;
-        }
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--sidebar-accent));
+    border-radius: 3px;
+  }
 
-        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-                background: hsl(var(--primary) / 0.5);
-        }
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
 
-        /* Scrollbar for cards and modals */
-        .card-scroll::-webkit-scrollbar {
-                width: 6px;
-        }
+  /* Scrollbar for cards and modals */
+  .card-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
 
-        .card-scroll::-webkit-scrollbar-track {
-                background: hsl(var(--card));
-        }
+  .card-scroll::-webkit-scrollbar-track {
+    background: hsl(var(--card));
+  }
 
-        .card-scroll::-webkit-scrollbar-thumb {
-                background: hsl(var(--primary) / 0.4);
-                border-radius: 3px;
-        }
+  .card-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.4);
+    border-radius: 3px;
+  }
 
-        .card-scroll::-webkit-scrollbar-thumb:hover {
-                background: hsl(var(--primary) / 0.6);
-        }
+  .card-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.6);
+  }
 }
