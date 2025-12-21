@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Flag, DollarSign, Calendar as CalendarIcon, Clock, Target, Maximize2 } from "lucide-react"
+import { Calendar, Users, Flag, DollarSign, Calendar as CalendarIcon, Clock, Target, Maximize2, RefreshCw } from "lucide-react"
 import { format } from "date-fns"
 
 interface Project {
@@ -200,6 +200,17 @@ export function ProjectDetailsModal({ project, open, onOpenChange }: ProjectDeta
                                              <p className="text-xs sm:text-sm text-muted-foreground">Criado em</p>
                                              <p className="text-sm sm:text-base font-medium truncate">
                                                   {format(new Date(project.created_at), 'dd/MM/yyyy HH:mm')}
+
+                                             </p>
+                                        </div>
+                                   </div>
+
+                                   <div className="flex items-center gap-2 sm:gap-3 p-3 rounded-lg bg-muted/50">
+                                        <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                                        <div className="min-w-0">
+                                             <p className="text-xs sm:text-sm text-muted-foreground">Última Atualização</p>
+                                             <p className="text-sm sm:text-base font-medium truncate">
+                                                  {format(new Date(project.updated_at), 'dd/MM/yyyy HH:mm')}
                                              </p>
                                         </div>
                                    </div>
