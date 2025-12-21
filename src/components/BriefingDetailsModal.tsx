@@ -7,386 +7,376 @@ import { Button } from "@/components/ui/button"
 import { FileText, Download, ChevronLeft, ChevronRight, X } from "lucide-react"
 
 interface Briefing {
-     id: string
-     title: string
-     client_name: string
-     project_type: string
-     target_audience: string | null
-     design_inspiration: string | null
-     main_objective: string | null
-     brand_personality: string | null
-     conversion_goals: any[]
-     color_palette: any
-     typography_primary: string | null
-     typography_secondary: string | null
-     brand_voice: string | null
-     logo_url: string | string[] | null
-     brand_assets: any[]
-     status: string
-     created_at: string
-     updated_at: string
+  id: string
+  title: string
+  client_name: string
+  project_type: string
+  target_audience: string | null
+  design_inspiration: string | null
+  main_objective: string | null
+  brand_personality: string | null
+  conversion_goals: any[]
+  color_palette: any
+  typography_primary: string | null
+  typography_secondary: string | null
+  brand_voice: string | null
+  logo_url: string | string[] | null
+  brand_assets: any[]
+  status: string
+  created_at: string
+  updated_at: string
 }
 
 interface BriefingDetailsModalProps {
-     briefing: Briefing
-     open: boolean
-     onOpenChange: (open: boolean) => void
+  briefing: Briefing
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export function BriefingDetailsModal({
-     briefing,
-     open,
-     onOpenChange
+  briefing,
+  open,
+  onOpenChange
 }: BriefingDetailsModalProps) {
-     const [lightboxOpen, setLightboxOpen] = useState(false)
-     const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  
+  // Ensure logoUrls is always an array
+  const logoUrls = React.useMemo(() => {
+    if (!briefing.logo_url) return []
+    if (Array.isArray(briefing.logo_url)) return briefing.logo_url
+    if (typeof briefing.logo_url === 'string') {
+      // Check if it's a JSON string array
+      try {
+        const parsed = JSON.parse(briefing.logo_url)
+        if (Array.isArray(parsed)) return parsed
+      } catch {
+        // Not a JSON string, treat as single URL
+      }
+      return [briefing.logo_url]
+    }
+    return []
+  }, [briefing.logo_url])
+  
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index)
+    setLightboxOpen(true)
+  }
+  
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % logoUrls.length)
+  }
+  
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + logoUrls.length) % logoUrls.length)
+  }
+  
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      draft: 'bg-muted text-muted-foreground',
+      in_progress: 'bg-blue-500/10 text-blue-500',
+      completed: 'bg-green-500/10 text-green-500',
+      approved: 'bg-purple-500/10 text-purple-500'
+    }
+    return colors[status] || colors.draft
+  }
 
-     // Ensure logoUrls is always an array
-     const logoUrls = React.useMemo(() => {
-          if (!briefing.logo_url) return []
-          if (Array.isArray(briefing.logo_url)) return briefing.logo_url
-          if (typeof briefing.logo_url === 'string') {
-               // Check if it's a JSON string array
-               try {
-                    const parsed = JSON.parse(briefing.logo_url)
-                    if (Array.isArray(parsed)) return parsed
-               } catch {
-                    // Not a JSON string, treat as single URL
-               }
-               return [briefing.logo_url]
-          }
-          return []
-     }, [briefing.logo_url])
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      draft: 'Rascunho',
+      in_progress: 'Em Progresso',
+      completed: 'Concluído',
+      approved: 'Aprovado'
+    }
+    return labels[status] || status
+  }
 
-     const openLightbox = (index: number) => {
-          setCurrentImageIndex(index)
-          setLightboxOpen(true)
-     }
+  const handleDownloadDocument = async (doc: any) => {
+    try {
+      const response = await fetch(doc.url)
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = doc.name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error('Erro ao baixar documento', error)
+    }
+  }
 
-     const nextImage = () => {
-          setCurrentImageIndex((prev) => (prev + 1) % logoUrls.length)
-     }
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0">
+            <div className="flex-1 min-w-0 w-full">
+              <DialogTitle className="text-xl sm:text-2xl break-words">{briefing.title}</DialogTitle>
+              <p className="text-muted-foreground mt-1 text-sm sm:text-base">{briefing.client_name}</p>
+            </div>
+            <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap self-start`}>
+              {getStatusLabel(briefing.status)}
+            </Badge>
+          </div>
+        </DialogHeader>
 
-     const prevImage = () => {
-          setCurrentImageIndex((prev) => (prev - 1 + logoUrls.length) % logoUrls.length)
-     }
+        <div className="space-y-4 sm:space-y-6">
+          {/* Logo */}
+          {briefing.logo_url && logoUrls.length > 0 && (
+            <Card className="p-4 sm:p-6">
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">Logo{logoUrls.length > 1 ? 's' : ''}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {logoUrls.map((url, index) => (
+                  <div
+                    key={index}
+                    onClick={() => openLightbox(index)}
+                    className="aspect-square cursor-pointer hover:opacity-80 transition-opacity rounded-lg overflow-hidden border border-border bg-muted"
+                  >
+                    <img
+                      src={url}
+                      alt={`Logo ${index + 1}`}
+                      className="w-full h-full object-contain p-4"
+                    />
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
-     const getStatusColor = (status: string) => {
-          const colors: Record<string, string> = {
-               draft: 'bg-muted text-muted-foreground',
-               in_progress: 'bg-blue-500/10 text-blue-500',
-               completed: 'bg-green-500/10 text-green-500',
-               approved: 'bg-purple-500/10 text-purple-500'
-          }
-          return colors[status] || colors.draft
-     }
+          {/* Basic Info */}
+          <Card className="p-4 sm:p-6">
+            <h3 className="font-semibold mb-3 text-sm sm:text-base">Informações Básicas</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Tipo de Projeto</p>
+                <p className="font-medium">{briefing.project_type}</p>
+              </div>
+              {briefing.brand_personality && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Personalidade da Marca</p>
+                  <p className="font-medium">{briefing.brand_personality}</p>
+                </div>
+              )}
+            </div>
+            {briefing.main_objective && (
+              <>
+                <Separator className="my-4" />
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Objetivo Principal</p>
+                  <p className="text-foreground">{briefing.main_objective}</p>
+                </div>
+              </>
+            )}
+          </Card>
 
-     const getStatusLabel = (status: string) => {
-          const labels: Record<string, string> = {
-               draft: 'Rascunho',
-               in_progress: 'Em Progresso',
-               completed: 'Concluído',
-               approved: 'Aprovado'
-          }
-          return labels[status] || status
-     }
+          {/* Target & Inspiration */}
+          {(briefing.target_audience || briefing.design_inspiration) && (
+            <Card className="p-4 sm:p-6">
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">Público e Inspiração</h3>
+              {briefing.target_audience && (
+                <div className="mb-4">
+                  <p className="text-sm text-muted-foreground mb-2">Público-Alvo</p>
+                  <p className="text-foreground">{briefing.target_audience}</p>
+                </div>
+              )}
+              {briefing.design_inspiration && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Inspirações/Referências</p>
+                  <p className="text-foreground">{briefing.design_inspiration}</p>
+                </div>
+              )}
+            </Card>
+          )}
 
-     const handleDownloadDocument = async (doc: any) => {
-          try {
-               const response = await fetch(doc.url)
-               const blob = await response.blob()
-               const blobUrl = URL.createObjectURL(blob)
-               const link = document.createElement('a')
-               link.href = blobUrl
-               link.download = doc.name
-               document.body.appendChild(link)
-               link.click()
-               document.body.removeChild(link)
-               URL.revokeObjectURL(blobUrl)
-          } catch (error) {
-               console.error('Erro ao baixar documento', error)
-          }
-     }
+          {/* Conversion Goals */}
+          {briefing.conversion_goals && briefing.conversion_goals.length > 0 && (
+            <Card className="p-4 sm:p-6">
+              <h3 className="font-semibold mb-3 text-sm sm:text-base">Metas de Conversão</h3>
+              <div className="space-y-2">
+                {briefing.conversion_goals.map((goal: any, index: number) => (
+                  <div key={index} className="p-3 bg-muted rounded-lg">
+                    <p className="font-medium">{goal.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {goal.metric}: {goal.target}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
-     return (
-          <Dialog open={open} onOpenChange={onOpenChange}>
-               <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                         <div className="relative">
-                              <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0">
-                                   <div className="flex-1 min-w-0 w-full">
-                                        <DialogTitle className="text-xl sm:text-2xl break-words">{briefing.title}</DialogTitle>
-                                        <p className="text-muted-foreground mt-1 text-sm sm:text-base">{briefing.client_name}</p>
-                                   </div>
-
-                                   {/* manter para fluxo quando for mobile */}
-                                   <div className="sm:hidden">
-                                        <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap self-start`}>
-                                             {getStatusLabel(briefing.status)}
-                                        </Badge>
-                                   </div>
-                              </div>
-
-                              {/* versão desktop posicionada de forma absoluta */}
-                              <div className="hidden sm:block absolute top-0 right-6">
-                                   <Badge className={`${getStatusColor(briefing.status)} whitespace-nowrap`}>
-                                        {getStatusLabel(briefing.status)}
-                                   </Badge>
-                              </div>
-                         </div>
-                    </DialogHeader>
-
-                    <div className="space-y-4 sm:space-y-6">
-                         {/* Logo */}
-                         {briefing.logo_url && logoUrls.length > 0 && (
-                              <Card className="p-4 sm:p-6">
-                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Logo{logoUrls.length > 1 ? 's' : ''}</h3>
-                                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                                        {logoUrls.map((url, index) => (
-                                             <div
-                                                  key={index}
-                                                  onClick={() => openLightbox(index)}
-                                                  className="aspect-square cursor-pointer hover:opacity-80 transition-opacity rounded-lg overflow-hidden border border-border bg-muted"
-                                             >
-                                                  <img
-                                                       src={url}
-                                                       alt={`Logo ${index + 1}`}
-                                                       className="w-full h-full object-contain p-4"
-                                                  />
-                                             </div>
-                                        ))}
-                                   </div>
-                              </Card>
-                         )}
-
-                         {/* Basic Info */}
-                         <Card className="p-4 sm:p-6">
-                              <h3 className="font-semibold mb-3 text-sm sm:text-base">Informações Básicas</h3>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                   <div>
-                                        <p className="text-sm text-muted-foreground">Tipo de Projeto</p>
-                                        <p className="font-medium">{briefing.project_type}</p>
-                                   </div>
-                                   {briefing.brand_personality && (
-                                        <div>
-                                             <p className="text-sm text-muted-foreground">Personalidade da Marca</p>
-                                             <p className="font-medium">{briefing.brand_personality}</p>
-                                        </div>
-                                   )}
-                              </div>
-                              {briefing.main_objective && (
-                                   <>
-                                        <Separator className="my-4" />
-                                        <div>
-                                             <p className="text-sm text-muted-foreground mb-2">Objetivo Principal</p>
-                                             <p className="text-foreground">{briefing.main_objective}</p>
-                                        </div>
-                                   </>
-                              )}
-                         </Card>
-
-                         {/* Target & Inspiration */}
-                         {(briefing.target_audience || briefing.design_inspiration) && (
-                              <Card className="p-4 sm:p-6">
-                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Público e Inspiração</h3>
-                                   {briefing.target_audience && (
-                                        <div className="mb-4">
-                                             <p className="text-sm text-muted-foreground mb-2">Público-Alvo</p>
-                                             <p className="text-foreground">{briefing.target_audience}</p>
-                                        </div>
-                                   )}
-                                   {briefing.design_inspiration && (
-                                        <div>
-                                             <p className="text-sm text-muted-foreground mb-2">Inspirações/Referências</p>
-                                             <p className="text-foreground">{briefing.design_inspiration}</p>
-                                        </div>
-                                   )}
-                              </Card>
-                         )}
-
-                         {/* Conversion Goals */}
-                         {briefing.conversion_goals && briefing.conversion_goals.length > 0 && (
-                              <Card className="p-4 sm:p-6">
-                                   <h3 className="font-semibold mb-3 text-sm sm:text-base">Metas de Conversão</h3>
-                                   <div className="space-y-2">
-                                        {briefing.conversion_goals.map((goal: any, index: number) => (
-                                             <div key={index} className="p-3 bg-muted rounded-lg">
-                                                  <p className="font-medium">{goal.description}</p>
-                                                  <p className="text-sm text-muted-foreground">
-                                                       {goal.metric}: {goal.target}
-                                                  </p>
-                                             </div>
-                                        ))}
-                                   </div>
-                              </Card>
-                         )}
-
-                         {/* Brand Guidelines */}
-                         <Card className="p-4 sm:p-6">
-                              <h3 className="font-semibold mb-3 text-sm sm:text-base">Guia de Marca</h3>
-
-                              {/* Color Palette */}
-                              {briefing.color_palette && Object.keys(briefing.color_palette).length > 0 && (
-                                   <div className="mb-4">
-                                        <p className="text-sm text-muted-foreground mb-2">Paleta de Cores</p>
-                                        <div className="flex flex-wrap gap-2">
-                                             {Object.entries(briefing.color_palette).map(([name, hex]) => (
-                                                  <div
-                                                       key={name}
-                                                       className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-muted rounded-lg min-w-0"
-                                                  >
-                                                       <div
-                                                            className="w-6 h-6 rounded border border-border flex-shrink-0"
-                                                            style={{ backgroundColor: hex as string }}
-                                                       />
-                                                       <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1 min-w-0 w-full">
-                                                            <span className="text-xs sm:text-sm font-medium break-words">{name}</span>
-                                                            <span className="text-xs text-muted-foreground break-all">{String(hex)}</span>
-                                                       </div>
-                                                  </div>
-                                             ))}
-                                        </div>
-                                   </div>
-                              )}
-
-                              {/* Typography */}
-                              {(briefing.typography_primary || briefing.typography_secondary) && (
-                                   <div className="mb-4">
-                                        <p className="text-sm text-muted-foreground mb-2">Tipografia</p>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                             {briefing.typography_primary && (
-                                                  <div>
-                                                       <p className="text-xs text-muted-foreground">Primária</p>
-                                                       <p className="font-medium">{briefing.typography_primary}</p>
-                                                  </div>
-                                             )}
-                                             {briefing.typography_secondary && (
-                                                  <div>
-                                                       <p className="text-xs text-muted-foreground">Secundária</p>
-                                                       <p className="font-medium">{briefing.typography_secondary}</p>
-                                                  </div>
-                                             )}
-                                        </div>
-                                   </div>
-                              )}
-
-                              {/* Brand Voice */}
-                              {briefing.brand_voice && (
-                                   <div>
-                                        <p className="text-sm text-muted-foreground mb-2">Tom de Voz</p>
-                                        <p className="text-foreground">{briefing.brand_voice}</p>
-                                   </div>
-                              )}
-                         </Card>
-
-                         {/* Documents Section */}
-                         {briefing.brand_assets && Array.isArray(briefing.brand_assets) && briefing.brand_assets.length > 0 && (
-                              <Card className="p-4 sm:p-6">
-                                   <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-                                        <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        Documentos e Arquivos
-                                   </h3>
-                                   <div className="space-y-2">
-                                        {briefing.brand_assets.map((doc: any) => (
-                                             <div
-                                                  key={doc.id}
-                                                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                                             >
-                                                  <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-1 min-w-0 w-full">
-                                                       <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground flex-shrink-0 mt-0.5 sm:mt-0" />
-                                                       <div className="min-w-0 flex-1">
-                                                            <p className="text-xs sm:text-sm font-medium break-words">{doc.name}</p>
-                                                            <p className="text-xs text-muted-foreground">
-                                                                 {doc.size ? `${(doc.size / 1024 / 1024).toFixed(2)} MB` : 'Tamanho desconhecido'}
-                                                            </p>
-                                                       </div>
-                                                  </div>
-                                                  <div className="flex gap-2 w-full sm:w-auto">
-                                                       <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleDownloadDocument(doc)}
-                                                            title="Baixar documento"
-                                                            className="flex-1 sm:flex-none"
-                                                       >
-                                                            <Download className="w-4 h-4 mr-2" />
-                                                            Baixar
-                                                       </Button>
-                                                  </div>
-                                             </div>
-                                        ))}
-                                   </div>
-                              </Card>
-                         )}
-
-                         {/* Metadata */}
-                         <Card className="p-4 sm:p-6">
-                              <h3 className="font-semibold mb-3 text-sm sm:text-base">Informações do Sistema</h3>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
-                                   <div>
-                                        <p className="text-muted-foreground">Criado em</p>
-                                        <p className="font-medium">
-                                             {new Date(briefing.created_at).toLocaleDateString('pt-BR')}
-                                        </p>
-                                   </div>
-                                   <div>
-                                        <p className="text-muted-foreground">Atualizado em</p>
-                                        <p className="font-medium">
-                                             {new Date(briefing.updated_at).toLocaleDateString('pt-BR')}
-                                        </p>
-                                   </div>
-                              </div>
-                         </Card>
+          {/* Brand Guidelines */}
+          <Card className="p-4 sm:p-6">
+            <h3 className="font-semibold mb-3 text-sm sm:text-base">Guia de Marca</h3>
+            
+            {/* Color Palette */}
+            {briefing.color_palette && Object.keys(briefing.color_palette).length > 0 && (
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground mb-2">Paleta de Cores</p>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(briefing.color_palette).map(([name, hex]) => (
+                    <div
+                      key={name}
+                      className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-muted rounded-lg min-w-0"
+                    >
+                      <div
+                        className="w-6 h-6 rounded border border-border flex-shrink-0"
+                        style={{ backgroundColor: hex as string }}
+                      />
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-1 min-w-0 w-full">
+                        <span className="text-xs sm:text-sm font-medium break-words">{name}</span>
+                        <span className="text-xs text-muted-foreground break-all">{String(hex)}</span>
+                      </div>
                     </div>
-               </DialogContent>
+                  ))}
+                </div>
+              </div>
+            )}
 
-               {/* Lightbox Dialog */}
-               <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-                    <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-black/95 border-0 [&>button]:!text-white [&>button]:bg-transparent [&>button]:active:bg-primary/20 [&>button]:hover:!text-primary [&>button]:top-4 [&>button]:right-4 [&>button]:rounded-full [&>button]:p-2 [&>button]:border-transparent [&>button]:hover:border-primary [&>button]:active:border-primary [&>button]:transition-all">
-                         <div className="relative w-full h-full flex items-center justify-center">
-                              <Button
-                                   variant="ghost"
-                                   size="icon"
-                                   onClick={() => setLightboxOpen(false)}>
+            {/* Typography */}
+            {(briefing.typography_primary || briefing.typography_secondary) && (
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground mb-2">Tipografia</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {briefing.typography_primary && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Primária</p>
+                      <p className="font-medium">{briefing.typography_primary}</p>
+                    </div>
+                  )}
+                  {briefing.typography_secondary && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Secundária</p>
+                      <p className="font-medium">{briefing.typography_secondary}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
-                              </Button>
+            {/* Brand Voice */}
+            {briefing.brand_voice && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Tom de Voz</p>
+                <p className="text-foreground">{briefing.brand_voice}</p>
+              </div>
+            )}
+          </Card>
 
-                              {logoUrls.length > 1 && (
-                                   <>
-                                        <Button
-                                             variant="ghost"
-                                             size="icon"
-                                             onClick={prevImage}
-                                             className="absolute left-4 z-50 text-white hover:bg-white/20"
-                                        >
-                                             <ChevronLeft className="w-8 h-8" />
-                                        </Button>
+          {/* Documents Section */}
+          {briefing.brand_assets && Array.isArray(briefing.brand_assets) && briefing.brand_assets.length > 0 && (
+            <Card className="p-4 sm:p-6">
+              <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+                Documentos e Arquivos
+              </h3>
+              <div className="space-y-2">
+                {briefing.brand_assets.map((doc: any) => (
+                  <div
+                    key={doc.id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                  >
+                    <div className="flex items-start sm:items-center gap-2 sm:gap-3 flex-1 min-w-0 w-full">
+                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground flex-shrink-0 mt-0.5 sm:mt-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm font-medium break-words">{doc.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {doc.size ? `${(doc.size / 1024 / 1024).toFixed(2)} MB` : 'Tamanho desconhecido'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownloadDocument(doc)}
+                        title="Baixar documento"
+                        className="flex-1 sm:flex-none"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Baixar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
-                                        <Button
-                                             variant="ghost"
-                                             size="icon"
-                                             onClick={nextImage}
-                                             className="absolute right-4 z-50 text-white hover:bg-white/20"
-                                        >
-                                             <ChevronRight className="w-8 h-8" />
-                                        </Button>
-                                   </>
-                              )}
+          {/* Metadata */}
+          <Card className="p-4 sm:p-6">
+            <h3 className="font-semibold mb-3 text-sm sm:text-base">Informações do Sistema</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">Criado em</p>
+                <p className="font-medium">
+                  {new Date(briefing.created_at).toLocaleDateString('pt-BR')}
+                </p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Atualizado em</p>
+                <p className="font-medium">
+                  {new Date(briefing.updated_at).toLocaleDateString('pt-BR')}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </DialogContent>
 
-                              <img
-                                   src={logoUrls[currentImageIndex]}
-                                   alt={`Logo ${currentImageIndex + 1}`}
-                                   className="max-w-[90%] max-h-[90%] object-contain"
-                              />
-
-                              {logoUrls.length > 1 && (
-                                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-4 py-2 rounded-full">
-                                        {currentImageIndex + 1} / {logoUrls.length}
-                                   </div>
-                              )}
-                         </div>
-                    </DialogContent>
-               </Dialog>
-          </Dialog>
-     )
+      {/* Lightbox Dialog */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-screen max-h-screen w-screen h-screen p-0 bg-black/95 border-0 [&>button]:hidden">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 z-50 text-white hover:bg-orange-500/20 hover:text-orange-500 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </Button>
+            
+            {logoUrls.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={prevImage}
+                  className="absolute left-1 z-20 text-white hover:bg-white/20"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={nextImage}
+                  className="absolute right-5 z-50 text-white hover:bg-white/20"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </Button>
+              </>
+            )}
+            
+            <div className="flex items-center justify-center w-full h-full pl-0 pr-4 sm:px-6 py-4 sm:py-8">
+            <img
+              src={logoUrls[currentImageIndex]}
+              alt={`Logo ${currentImageIndex + 1}`}
+              className="max-w-[90%] max-h-[90%] object-contain"
+            />
+            </div>
+            {logoUrls.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-4 py-2 rounded-full">
+                {currentImageIndex + 1} / {logoUrls.length}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </Dialog>
+  )
 }
