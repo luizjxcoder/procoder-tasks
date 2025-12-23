@@ -405,21 +405,21 @@ const Projects = () => {
 
                          <main className="flex-1 p-3 sm:p-6">
                               {/* Header */}
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                              <div className="flex flex-col gap-4 mb-8">
                                    <div className="flex items-center gap-4">
                                         <SidebarTrigger className="lg:hidden h-12 w-12 p-3 [&_svg]:w-6 [&_svg]:h-6" />
-                                        <div>
-                                             <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Projetos</h1>
-                                             <p className="text-sm sm:text-base text-muted-foreground">Gerencie todos os seus projetos</p>
+                                        <div className="flex-1">
+                                             <h1 className="text-3xl font-bold text-foreground">Projetos</h1>
+                                             <p className="text-muted-foreground">Gerencie seus projetos</p>
                                         </div>
                                    </div>
 
                                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                                         <DialogTrigger asChild>
-                                             <Button className="bg-gradient-primary hover:bg-gradient-primary/90 w-full sm:w-auto">
+                                             <Button className="bg-gradient-primary hover:bg-gradient-primary/90 shrink-0">
                                                   <Plus className="w-4 h-4 mr-2" />
-                                                  <span className="hidden sm:inline">Novo Projeto</span>
-                                                  <span className="sm:hidden">Novo</span>
+                                                  <span className="hidden xs:inline">Novo Projeto</span>
+                                                  <span className="xs:hidden">Novo</span>
                                              </Button>
                                         </DialogTrigger>
                                         <DialogContent
@@ -472,8 +472,8 @@ const Projects = () => {
                                                   </Button>
                                              </div>
                                         ) : isMobile ? (
-                                             // Mobile Card View
-                                             <div className="space-y-4">
+                                             // Mobile Card View - responsive grid that compresses
+                                             <div className="grid grid-cols-1 gap-4">
                                                   {projects.map((project) => (
                                                        <ProjectCard key={project.id} project={project} />
                                                   ))}

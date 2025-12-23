@@ -75,7 +75,7 @@ export function ProjectDetailsModal({ project, open, onOpenChange }: ProjectDeta
      return (
           <>
                <Dialog open={open} onOpenChange={onOpenChange}>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
                          <DialogHeader>
                               <DialogTitle className="text-xl sm:text-2xl">Detalhes do Projeto</DialogTitle>
                          </DialogHeader>

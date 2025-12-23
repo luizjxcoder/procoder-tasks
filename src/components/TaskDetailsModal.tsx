@@ -80,7 +80,7 @@ export function TaskDetailsModal({ task, projects, open, onOpenChange }: TaskDet
 
      return (
           <Dialog open={open} onOpenChange={onOpenChange}>
-               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
                     <DialogHeader>
                          <DialogTitle className="text-lg sm:text-2xl">Detalhes da Tarefa</DialogTitle>
                     </DialogHeader>
