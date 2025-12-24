@@ -2,11 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Task Manager Design System - Dark Professional Theme */
+/* Task Manager Design System - Light/Dark Theme Support */
 
 @layer base {
   :root {
-    /* Dark theme colors - HSL format */
+    --radius: 0.75rem;
+
+    /* Custom design tokens */
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --info: 217 91% 60%;
+    
+    /* Project priority colors */
+    --priority-high: 0 84% 60%;
+    --priority-medium: 38 92% 50%;
+    --priority-low: 142 71% 45%;
+
+    /* Animation timing */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Dark Mode Base */
+  .dark {
     --background: 220 13% 8%;
     --foreground: 210 11% 85%;
 
@@ -28,24 +46,12 @@
     --border: 220 13% 18%;
     --input: 220 13% 14%;
 
-    --radius: 0.75rem;
-
     /* Sidebar colors */
     --sidebar-background: 220 13% 8%;
     --sidebar-foreground: 210 11% 85%;
     --sidebar-accent: 220 13% 14%;
     --sidebar-accent-foreground: 210 11% 85%;
     --sidebar-border: 220 13% 18%;
-
-    /* Custom design tokens */
-    --success: 142 71% 45%;
-    --warning: 38 92% 50%;
-    --info: 217 91% 60%;
-    
-    /* Project priority colors */
-    --priority-high: 0 84% 60%;
-    --priority-medium: 38 92% 50%;
-    --priority-low: 142 71% 45%;
 
     /* Gradients */
     --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 13% 12%));
@@ -54,22 +60,57 @@
     /* Shadows */
     --shadow-card: 0 4px 20px -2px hsl(220 13% 4% / 0.3);
     --shadow-hover: 0 8px 30px -4px hsl(220 13% 4% / 0.4);
-
-    /* Animation timing */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
-  /* Default Theme (Orange) */
+  /* Light Mode Base */
+  .light {
+    --background: 220 7% 90%;
+    --foreground: 220 13% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 15%;
+
+    --secondary: 220 7% 94%;
+    --secondary-foreground: 220 13% 15%;
+
+    --muted: 220 7% 88%;
+    --muted-foreground: 215 16% 40%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 100%;
+    --input: 220 7% 94%;
+
+    /* Sidebar colors */
+    --sidebar-background: 220 7% 92%;
+    --sidebar-foreground: 220 13% 15%;
+    --sidebar-accent: 220 7% 88%;
+    --sidebar-accent-foreground: 220 13% 15%;
+    --sidebar-border: 220 10% 82%;
+
+    /* Gradients */
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 7% 98%));
+    --gradient-sidebar: linear-gradient(180deg, hsl(var(--sidebar-background)), hsl(220 7% 88%));
+
+    /* Shadows */
+    --shadow-card: 0 4px 20px -2px hsl(220 13% 50% / 0.1);
+    --shadow-hover: 0 8px 30px -4px hsl(220 13% 50% / 0.15);
+  }
+
+  /* Default Theme (Orange) - Works in both light and dark modes */
   .theme-default {
     --primary: 16 100% 66%;
-    --primary-foreground: 220 13% 8%;
+    --primary-foreground: 0 0% 100%;
     --primary-rgb: 255, 122, 82;
     --accent: 16 100% 66%;
-    --accent-foreground: 220 13% 8%;
+    --accent-foreground: 0 0% 100%;
     --ring: 16 100% 66%;
     --sidebar-primary: 16 100% 66%;
-    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-ring: 16 100% 66%;
     --gradient-primary: linear-gradient(135deg, hsl(16 100% 66%), hsl(16 100% 56%));
     --shadow-primary: 0 4px 20px -2px hsl(16 100% 66% / 0.2);
@@ -78,13 +119,13 @@
   /* Green Theme */
   .theme-green {
     --primary: 160 78% 41%;
-    --primary-foreground: 220 13% 8%;
+    --primary-foreground: 0 0% 100%;
     --primary-rgb: 23, 186, 139;
     --accent: 160 78% 41%;
-    --accent-foreground: 220 13% 8%;
+    --accent-foreground: 0 0% 100%;
     --ring: 160 78% 41%;
     --sidebar-primary: 160 78% 41%;
-    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-ring: 160 78% 41%;
     --gradient-primary: linear-gradient(135deg, hsl(160 78% 41%), hsl(160 78% 31%));
     --shadow-primary: 0 4px 20px -2px hsl(160 78% 41% / 0.2);
@@ -93,13 +134,13 @@
   /* Blue Theme */
   .theme-blue {
     --primary: 195 100% 50%;
-    --primary-foreground: 220 13% 8%;
+    --primary-foreground: 0 0% 100%;
     --primary-rgb: 0, 191, 255;
     --accent: 195 100% 50%;
-    --accent-foreground: 220 13% 8%;
+    --accent-foreground: 0 0% 100%;
     --ring: 195 100% 50%;
     --sidebar-primary: 195 100% 50%;
-    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-ring: 195 100% 50%;
     --gradient-primary: linear-gradient(135deg, hsl(195 100% 50%), hsl(195 100% 40%));
     --shadow-primary: 0 4px 20px -2px hsl(195 100% 50% / 0.2);
@@ -108,13 +149,13 @@
   /* Purple Theme */
   .theme-purple {
     --primary: 262 83% 58%;
-    --primary-foreground: 220 13% 8%;
+    --primary-foreground: 0 0% 100%;
     --primary-rgb: 139, 92, 246;
     --accent: 262 83% 58%;
-    --accent-foreground: 220 13% 8%;
+    --accent-foreground: 0 0% 100%;
     --ring: 262 83% 58%;
     --sidebar-primary: 262 83% 58%;
-    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-ring: 262 83% 58%;
     --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(262 83% 48%));
     --shadow-primary: 0 4px 20px -2px hsl(262 83% 58% / 0.2);

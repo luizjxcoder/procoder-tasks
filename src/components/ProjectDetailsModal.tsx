@@ -114,7 +114,7 @@ export function ProjectDetailsModal({ project, open, onOpenChange }: ProjectDeta
                                    <div className="space-y-2">
                                         <h2 className="text-sm font-semibold text-card-foreground">Descrição</h2>
                                         <div className="p-3 rounded-lg bg-muted/50">
-                                             <p className="text-sm text-white whitespace-pre-wrap">
+                                             <p className="text-sm text-foreground whitespace-pre-wrap">
                                                   {project.description}
                                              </p>
                                         </div>

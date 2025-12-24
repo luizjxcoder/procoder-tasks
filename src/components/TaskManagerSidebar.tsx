@@ -11,13 +11,16 @@ import {
      Users,
      UserCircle,
      Palette,
-     TrendingDown
+     TrendingDown,
+      ToggleLeft,
+  ToggleRight
 } from "lucide-react"
 import defaultSidebarLogo from "@/assets/minhaLogo.png"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useRoles } from "@/hooks/useRoles"
 import { useSettings } from "@/contexts/SettingsContext"
+import { useTheme } from "@/contexts/ThemeContext"
 
 import {
      Sidebar,
@@ -44,6 +47,7 @@ export function TaskManagerSidebar() {
      const { user, signOut } = useAuth()
      const { isAdmin } = useRoles()
      const { systemName, logoUrl } = useSettings()
+     const { themeMode, toggleThemeMode } = useTheme()
      const { toast } = useToast()
      const currentPath = location.pathname
      const collapsed = state === "collapsed"
@@ -156,6 +160,29 @@ export function TaskManagerSidebar() {
                          </SidebarMenu>
                     </SidebarGroupContent>
                </SidebarGroup>
+
+
+               {/* Theme Mode Toggle */}
+               <div className={`${showFullContent ? '' : 'flex justify-center'} mb-4`}>
+                    <Button
+                         variant="ghost"
+                         size={showFullContent ? "default" : "icon"}
+                         className={`${showFullContent ? 'w-full justify-start' : 'w-10 h-10'} text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-300`}
+                         onClick={toggleThemeMode}
+                    >
+                         {themeMode === 'dark' ? (
+                              <>
+                                   <ToggleLeft className={`h-6 w-6 ${showFullContent ? 'mr-3' : ''}`} />
+                                   {showFullContent && <span className="font-medium">Modo Claro</span>}
+                              </>
+                         ) : (
+                              <>
+                                   <ToggleRight className={`h-6 w-6 text-primary ${showFullContent ? 'mr-3' : ''}`} />
+                                   {showFullContent && <span className="font-medium">Modo Escuro</span>}
+                              </>
+                         )}
+                    </Button>
+               </div>
 
                {/* User Profile */}
                {showFullContent && (

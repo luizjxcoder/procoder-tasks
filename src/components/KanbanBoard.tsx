@@ -116,9 +116,9 @@ function KanbanTaskCard({ task, getProjectName, onViewDetails, onEdit, onDelete 
                                         {getProjectName(task.project_id)}
                                    </span>
 
-                                   <div className="flex flex-wrap items-center gap-2">
+                                   <div className="flex flex-wrap items-center gap-3">
                                         {task.due_date && (
-                                             <div className="flex items-center gap-1">
+                                             <div className="flex items-center gap-3">
                                                   <Calendar className="w-3 h-3" />
                                                   <span className="whitespace-nowrap">{new Date(task.due_date).toLocaleDateString('pt-BR')}</span>
                                              </div>
