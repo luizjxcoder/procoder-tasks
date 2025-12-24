@@ -406,7 +406,7 @@ export default function Calendar() {
                           return new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
                         })
                         .map(task => (
-                          <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg transition-all duration-300 hover:border-primary hover:shadow-[inset_0_0_20px_rgba(var(--primary-rgb),0.15),inset_20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2)]">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1 flex-wrap">
                                 <h4 className="font-medium">

@@ -407,7 +407,7 @@ export default function Investments() {
                                         {filteredInvestments.map((investment) => (
                                              <Card
                                                   key={investment.id}
-                                                  className="group hover:shadow-md transition-all duration-300 border-l-4 border-l-primary"
+                                                 className="group transition-all duration-300 border-l-4 border-l-primary hover:border-primary hover:shadow-[inset_0_0_20px_rgba(var(--primary-rgb),0.15),inset_20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2)]"
                                              >
                                                   <CardContent className="p-3">
                                                        <div className="flex items-start justify-between gap-2 mb-2">
