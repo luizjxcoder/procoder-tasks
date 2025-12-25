@@ -75,7 +75,7 @@ export function ProjectDetailsModal({ project, open, onOpenChange }: ProjectDeta
      return (
           <>
                <Dialog open={open} onOpenChange={onOpenChange}>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
+                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
                          <DialogHeader>
                               <DialogTitle className="text-xl sm:text-2xl">Detalhes do Projeto</DialogTitle>
                          </DialogHeader>
@@ -112,8 +112,8 @@ export function ProjectDetailsModal({ project, open, onOpenChange }: ProjectDeta
                               {/* Description */}
                               {project.description && (
                                    <div className="space-y-2">
-                                        <h2 className="text-sm font-semibold text-card-foreground">Descrição</h2>
-                                        <div className="p-3 rounded-lg bg-muted/50">
+                                        <h2 className="text-SM font-semibold text-card-foreground">DESCRIÇÃO DO PROJETO:</h2>
+                                        <div className="p-8 rounded-lg bg-muted/50">
                                              <p className="text-sm text-foreground whitespace-pre-wrap">
                                                   {project.description}
                                              </p>

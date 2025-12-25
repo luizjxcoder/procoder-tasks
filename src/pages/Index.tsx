@@ -240,7 +240,7 @@ const Index = () => {
                               {/* CARDS DE STATUS */}
                               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 mb-8">
                                    {stats.map((stat, i) => (
-                                        <div key={i} className="bg-gradient-card border border-border rounded-xl p-6 shadow-card">
+                                        <div key={i} className="bg-gradient-card border border-border rounded-2xl p-6 shadow-card">
                                              <div className="flex items-center justify-between">
                                                   <div>
                                                        <p className="text-sm text-muted-foreground">{stat.label}</p>
@@ -265,7 +265,12 @@ const Index = () => {
                                         {/* Projetos Recentes */}
                                         <div className="space-y-6">
                                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                                  <h2 className="text-lg sm:text-xl font-semibold text-foreground">Projetos Recentes</h2>
+                                                  <h2 className="
+  text-lg sm:text-xl font-semibold
+  text-foreground/80 dark:text-foreground/100
+">
+  Projetos Recentes
+</h2>
                                                   <div className="flex items-center gap-2">
                                                        <Badge variant="secondary">{realProjects.length}</Badge>
                                                        {realProjects.length > 0 && (

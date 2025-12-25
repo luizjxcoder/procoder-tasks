@@ -58,7 +58,7 @@ export function ProjectCard({
 }: ProjectCardProps) {
      const thumbnail = project?.image_url ?? imageUrl
      return (
-          <div className="bg-gradient-card border border-border rounded-xl p-4 sm:p-6 shadow-card hover:shadow-hover transition-all duration-300 group">
+          <div className="bg-gradient-card border border-border rounded-3xl p-4 sm:p-6 shadow-card hover:shadow-hover transition-all duration-300 group">
                {/* Header */}
                <div className="flex items-start justify-between mb-4 gap-3">
                     <div className="flex items-center gap-3 min-w-0 flex-1">

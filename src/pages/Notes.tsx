@@ -407,24 +407,13 @@ export default function Notes() {
                                    {filteredNotes.map((note) => (
                                         <Card
                                              key={note.id}
-                                            className="
-                    relative flex flex-col overflow-hidden
-                    rounded-xl
-                    bg-card dark:bg-[#1C1E24]
-                    border border-border dark:border-white/10
-                    before:content-[''] before:absolute before:inset-0 before:rounded-[inherit]
-                    before:pointer-events-none
-                    before:transition-all before:duration-200 before:ease-[cubic-bezier(0.4,0,0.2,1)]
-                    dark:before:shadow-[inset_0_0_55px_22px_rgba(0,0,0,0.45),inset_0_0_110px_55px_rgba(0,0,0,0.32)]
-                    dark:before:opacity-65
-                    hover:scale-[1.015]
-                    hover:border-primary
-                    hover:shadow-[inset_0_0_20px_rgba(var(--primary-rgb),0.15),inset_20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2)]
-                    dark:hover:shadow-[0_0_35px_15px_rgba(0,0,0,0.55),inset_0_0_20px_rgba(var(--primary-rgb),0.15),inset_20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.2),inset_-20px_20px_30px_-25px_rgba(var(--primary-rgb),0.2)]
-                    dark:hover:before:opacity-85
-                    dark:hover:before:shadow-[inset_0_0_75px_30px_rgba(0,0,0,0.55),inset_0_0_150px_75px_rgba(0,0,0,0.40)]
-                    transition-all duration-300
-  ">
+                                          className="
+  relative flex flex-col overflow-hidden rounded-xl bg-card
+  transition-all duration-300
+  hover:border-primary
+  hover:shadow-[inset_0_0_20px_rgba(var(--primary-rgb),0.18),inset_20px_20px_30px_-25px_rgba(var(--primary-rgb),0.22),inset_-20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.22),inset_20px_-20px_30px_-25px_rgba(var(--primary-rgb),0.22),inset_-20px_20px_30px_-25px_rgba(var(--primary-rgb),0.22)]
+">
+
 
                                              <CardHeader className="pb-2 px-2.5 sm:px-4 md:px-6 pt-2.5 sm:pt-4 md:pt-6">
                                                   <div className="flex items-start justify-between gap-1.5 sm:gap-2">

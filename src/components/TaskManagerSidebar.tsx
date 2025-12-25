@@ -12,8 +12,8 @@ import {
      UserCircle,
      Palette,
      TrendingDown,
-      ToggleLeft,
-  ToggleRight
+      Sun,
+  Moon
 } from "lucide-react"
 import defaultSidebarLogo from "@/assets/minhaLogo.png"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
@@ -152,7 +152,7 @@ export function TaskManagerSidebar() {
                                         <SidebarMenuButton asChild className="p-0">
                                              <button onClick={() => handleNavClick(item.url)} className={getNavClass(item.url)}>
                                                   <item.icon className="w-5 h-5 flex-shrink-0" />
-                                                  {showFullContent && <span className="font-medium">{item.title}</span>}
+                                                  {showFullContent && <span className="font-medium text-base">{item.title}</span>}
                                              </button>
                                         </SidebarMenuButton>
                                    </SidebarMenuItem>
@@ -172,12 +172,12 @@ export function TaskManagerSidebar() {
                     >
                          {themeMode === 'dark' ? (
                               <>
-                                   <ToggleLeft className={`h-6 w-6 ${showFullContent ? 'mr-3' : ''}`} />
+                                   <Sun className={`!h-6 !w-6 flex-shrink-0 ${showFullContent ? 'mr-3' : ''}`} />
                                    {showFullContent && <span className="font-medium">Modo Claro</span>}
                               </>
                          ) : (
                               <>
-                                   <ToggleRight className={`h-6 w-6 text-primary ${showFullContent ? 'mr-3' : ''}`} />
+                                   <Moon className={`!h-6 !w-6 flex-shrink-0 text-primary ${showFullContent ? 'mr-3' : ''}`} />
                                    {showFullContent && <span className="font-medium">Modo Escuro</span>}
                               </>
                          )}
