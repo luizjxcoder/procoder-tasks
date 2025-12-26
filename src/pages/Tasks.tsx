@@ -544,7 +544,7 @@ export default function Tasks() {
                                                        <span className="sm:hidden">Nova</span>
                                                   </Button>
                                              </DialogTrigger>
-                                             <DialogContent className="max-w-md w-[95vw] sm:w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+                                             <DialogContent className="max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
                                                   <DialogHeader>
                                                        <DialogTitle className="text-lg sm:text-xl">Criar Nova Task</DialogTitle>
                                                   </DialogHeader>
@@ -1013,7 +1013,7 @@ export default function Tasks() {
 
                               {/* Edit Dialog */}
                               <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                                   <DialogContent className="max-w-md w-[95vw] sm:w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+                                   <DialogContent className="max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
                                         <DialogHeader>
                                              <DialogTitle>Editar Task</DialogTitle>
                                         </DialogHeader>
@@ -1142,30 +1142,48 @@ export default function Tasks() {
 
                               {/* Delete Confirmation Dialog */}
                               <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-                                   <AlertDialogContent>
+                                   <AlertDialogContent
+                                        className="
+                                                       max-h-[80vh]
+                                                       overflow-y-auto
+                                                       w-[95vw]
+                                                       mx-auto
+                                                       sm:w-full
+                                                       p-4
+                                                  ">
                                         <AlertDialogHeader>
                                              <div className="flex items-center gap-3 mb-2">
                                                   <div className="p-2 bg-destructive/10 rounded-lg">
                                                        <Trash2 className="w-5 h-5 text-destructive" />
                                                   </div>
+
                                                   <div>
                                                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                                                   </div>
                                              </div>
+
                                              <AlertDialogDescription>
-                                                  Tem certeza que deseja excluir a tarefa <span className="font-semibold">"{deletingTask?.title}"</span>?
+                                                  Tem certeza que deseja excluir a tarefa{" "}
+                                                  <span className="font-semibold">
+                                                       "{deletingTask?.title}"
+                                                  </span>
+                                                  ?
+
                                                   {deletingTask?.subtasks && deletingTask.subtasks.length > 0 && (
                                                        <span className="block mt-2 text-warning">
                                                             Esta ação também excluirá {deletingTask.subtasks.length} subtarefa(s) associada(s).
                                                        </span>
                                                   )}
+
                                                   <span className="block mt-2">
                                                        Esta ação não pode ser desfeita.
                                                   </span>
                                              </AlertDialogDescription>
                                         </AlertDialogHeader>
+
                                         <AlertDialogFooter>
                                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+
                                              <AlertDialogAction
                                                   onClick={handleDeleteConfirm}
                                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -1174,6 +1192,8 @@ export default function Tasks() {
                                              </AlertDialogAction>
                                         </AlertDialogFooter>
                                    </AlertDialogContent>
+
+
                               </AlertDialog>
                          </div>
                     </main>

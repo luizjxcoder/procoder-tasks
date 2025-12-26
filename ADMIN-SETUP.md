@@ -154,7 +154,7 @@ Para dúvidas técnicas sobre o sistema, entre em contato com o desenvolvedor.
 
 npm run build        # gera o dist atualizado**
 git add .
-git commit -m "cantos arredondados"
+git commit -m "ajuste fonte modo claro"
 git push origin master   # envia o código-fonte atualizado
 npm run deploy           # publica o dist no branch gh-pages
 

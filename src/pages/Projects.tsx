@@ -420,7 +420,7 @@ const Projects = () => {
                     </Button>
                   </DialogTrigger>
                   <DialogContent 
-                    className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full"
+                    className="max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4"
                     onPointerDownOutside={(e) => e.preventDefault()}
                     onInteractOutside={(e) => e.preventDefault()}
                   >
@@ -608,7 +608,7 @@ const Projects = () => {
 
             {/* Edit Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
                 <DialogHeader>
                   <DialogTitle>Editar Projeto</DialogTitle>
                 </DialogHeader>
@@ -624,7 +624,7 @@ const Projects = () => {
 
             {/* Delete Confirmation Dialog */}
             <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-              <AlertDialogContent className="max-w-md">
+              <AlertDialogContent className="max-w-md max-h-[80vh] overflow-y-auto w-[95vw] mx-auto sm:w-full p-4">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="flex items-center gap-2 text-destructive">
                     <Trash2 className="w-5 h-5" />
